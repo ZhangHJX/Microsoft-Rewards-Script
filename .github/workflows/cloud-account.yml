@@ -1,0 +1,45 @@
+name: Single account cloud run
+
+on:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: rewards-single-account
+    cancel-in-progress: false
+
+jobs:
+    account:
+        if: vars.REWARDS_CLOUD_ENABLED == 'true'
+        runs-on: ubuntu-latest
+        timeout-minutes: 45
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  persist-credentials: false
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+              with:
+                  node-version: 24
+                  cache: npm
+            - name: Install locked dependencies
+              run: npm ci --ignore-scripts --no-audit --no-fund
+            - name: Build
+              run: npm run build
+            - name: Install browser and Linux dependencies
+              run: npx patchright install --with-deps chromium
+            - name: Restore, run one account and save encrypted state
+              run: npm run cloud:run
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
+                  REWARDS_STATE_KEY: ${{ secrets.REWARDS_STATE_KEY }}
+                  REWARDS_CONFIG_JSON: ${{ secrets.REWARDS_CONFIG_JSON }}
+                  ACCOUNT_1_EMAIL: ${{ secrets.REWARDS_ACCOUNT_EMAIL }}
+                  ACCOUNT_1_PASSWORD: ${{ secrets.REWARDS_ACCOUNT_PASSWORD }}
+                  ACCOUNT_1_TOTP_SECRET: ${{ secrets.REWARDS_ACCOUNT_TOTP_SECRET }}
+                  ACCOUNT_1_RECOVERY_EMAIL: ${{ secrets.REWARDS_ACCOUNT_RECOVERY_EMAIL }}
+                  ACCOUNT_1_GEO_LOCALE: ${{ vars.REWARDS_REGION || 'auto' }}
+                  ACCOUNT_1_LANG_CODE: ${{ vars.REWARDS_LANGUAGE || 'en' }}

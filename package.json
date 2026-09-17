@@ -32,6 +32,7 @@
         "open-session": "node ./scripts/main/browserSession.js -email",
         "test:reliability": "npm run build && node --test scripts/api/logParser.test.js scripts/validation/*.test.mjs",
         "recover:account": "node scripts/main/recover-account.mjs",
+        "cloud:run": "node scripts/main/cloud-entry.mjs",
         "state:export": "node scripts/main/state-cli.mjs export",
         "state:import": "node scripts/main/state-cli.mjs import",
         "start:bounded": "node scripts/main/run-bounded.mjs --timeout-ms 1800000 --grace-ms 5000 -- node dist/index.js"

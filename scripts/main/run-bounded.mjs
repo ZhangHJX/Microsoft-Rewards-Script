@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process'
 import { parseArgs } from 'node:util'
 import { pathToFileURL } from 'node:url'
 
-export async function runBounded(command, args, { timeoutMs, graceMs = 5000 }) {
+export async function runBounded(command, args, { timeoutMs, graceMs = 5000, cwd, env, stdio = 'inherit' }) {
     if (process.platform === 'win32') throw new Error('Process-group supervision requires Linux or macOS')
     if (
         !Number.isSafeInteger(timeoutMs) ||
@@ -14,7 +14,7 @@ export async function runBounded(command, args, { timeoutMs, graceMs = 5000 }) {
     )
         throw new Error('Invalid runtime budget')
     return await new Promise(resolve => {
-        const child = spawn(command, args, { detached: true, stdio: 'inherit' })
+        const child = spawn(command, args, { detached: true, stdio, cwd, env })
         let reason = 'exited'
         let forcedCode
         let hardTimer
@@ -51,7 +51,10 @@ export async function runBounded(command, args, { timeoutMs, graceMs = 5000 }) {
             resolve({ code: forcedCode ?? code ?? 1, reason: failedToSpawn ? 'spawn_failed' : reason })
         }
         child.once('error', () => finish(1, true))
-        child.once('exit', code => finish(code))
+        child.once('exit', (code, signal) => {
+            if (signal && forcedCode === undefined) reason = 'signaled'
+            finish(code)
+        })
     })
 }
 

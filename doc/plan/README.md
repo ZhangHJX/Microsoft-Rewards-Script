@@ -32,3 +32,5 @@ State-transfer increment: consistent SQLite snapshots are authenticated and encr
 State CLI increment: environment-secret export/import commands and exclusive ciphertext publication are tested in real child processes. Build and 214 local tests pass. Next: remote state transport and freshness/retention failure behavior before live deployment.
 
 Remote-state increment: dedicated-branch Contents API adapter now enforces ready/pending conditional revisions and no blind retries. Synthetic live GitHub round trip and conflict protection passed; temporary branch removed. Build and 225 local tests pass. Next: workflow orchestration, initial session provisioning and independent runner acceptance. See [remote protocol](modules/single-account-cloud/remote-state-design.md).
+
+Cloud orchestration increment: manual, disabled-by-default workflow and restore/claim/bounded-run/publish entry are implemented. Build and 241 local tests pass; real Rewards execution and initial provisioning remain pending. See [deployment contract](modules/single-account-cloud/cloud-workflow.md).

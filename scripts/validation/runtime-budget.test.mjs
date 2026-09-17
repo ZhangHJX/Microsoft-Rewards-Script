@@ -67,3 +67,39 @@ test('timeout stops descendant activity as well as the group leader', async t =>
     await new Promise(resolve => setTimeout(resolve, 100))
     assert.equal(readFileSync(marker, 'utf8'), stopped)
 })
+
+test('isolated child options control working directory, environment and output', async t => {
+    const { mkdtempSync, readFileSync, rmSync, realpathSync } = await import('node:fs')
+    const { tmpdir } = await import('node:os')
+    const { join } = await import('node:path')
+    const directory = mkdtempSync(join(tmpdir(), 'runtime-isolation-'))
+    t.after(() => rmSync(directory, { recursive: true, force: true }))
+    const result = await runBounded(
+        process.execPath,
+        [
+            '-e',
+            'require("node:fs").writeFileSync("result.json", JSON.stringify({cwd:process.cwd(), marker:process.env.SYNTHETIC_MARKER}));console.log("suppressed")'
+        ],
+        {
+            timeoutMs: 2000,
+            graceMs: 100,
+            cwd: directory,
+            env: { SYNTHETIC_MARKER: 'isolated' },
+            stdio: 'ignore'
+        }
+    )
+    assert.equal(result.code, 0)
+    assert.deepEqual(JSON.parse(readFileSync(join(directory, 'result.json'), 'utf8')), {
+        cwd: realpathSync(directory),
+        marker: 'isolated'
+    })
+})
+
+test('external child termination is not reported as an ordinary exit', async () => {
+    const result = await runBounded(process.execPath, ['-e', 'process.kill(process.pid,"SIGTERM")'], {
+        timeoutMs: 2000,
+        graceMs: 100
+    })
+    assert.equal(result.reason, 'signaled')
+    assert.notEqual(result.code, 0)
+})
