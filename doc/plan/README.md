@@ -17,8 +17,8 @@ The target remains the [confirmed single-account cloud requirements](modules/sin
 | Regional acceptance | Neither market tested | TODO: separate CN/HK evidence and multi-day completion/intervention metrics |
 | Upstream maintenance | Fork and upstream remote preserved | TODO: documented update review and rollback validation |
 
-Next: implement a hard process-level execution budget, then audit runtime acceptance and identify required real-environment inputs. Review login/recovery integration against the same contracts. Obtain required user account/environment input when live acceptance is reached, rather than treating offline coverage as completion.
+Next: add Linux offline CI, then address the [acceptance audit](modules/single-account-cloud/acceptance-audit.md) and upstream update/rollback procedure. Review login/recovery integration against the same contracts. Obtain required user account/environment input when live acceptance is reached, rather than treating offline coverage as completion.
 
 For each stage: reproduce the defect or failing acceptance test, implement the smallest coherent change, run affected regressions/build, review limitations, update this plan and operation log, commit and push. Never report an unexecuted check as passing.
 
-Latest verification: build and 180 tests pass; see [account-lock evidence](../operation-log/2026-09-17-phase-8-account-lock.md). Earlier operation logs are historical snapshots, not the current checklist. The [code-disposition inventory](modules/single-account-cloud/code-disposition.md) records the initial audit and should be interpreted alongside current changes.
+Latest verification: build and 187 tests pass; see [runtime-budget evidence](../operation-log/2026-09-17-phase-8-runtime-budget.md). Earlier operation logs are historical snapshots, not the current checklist. The [code-disposition inventory](modules/single-account-cloud/code-disposition.md) records the initial audit and should be interpreted alongside current changes.

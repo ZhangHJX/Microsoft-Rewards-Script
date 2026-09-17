@@ -1,0 +1,25 @@
+# Acceptance audit
+
+- updated_at: 2026-09-17
+- author: Codex
+- status: incomplete; no-deployment-claim
+
+| Requirement group | Evidence | Remaining verification/work |
+| --- | --- | --- |
+| Single account | initialization/count tests and Actions enforcement | complete actual deployment configuration |
+| Concurrent triggers | real-process SQLite account lock tests | stable cross-runner concurrency group and persistence setup |
+| Credentials/log confidentiality | no credentials committed; sanitized result errors | lower-level diagnostic/log audit and encrypted cloud state transport |
+| Automatic authentication | upstream implementation retained | branch-specific login/session-recovery tests and real session expiry evidence |
+| Bounded recovery | token/version and timeout tests | login-specific budgets and actual interaction fallback |
+| Page/field changes | strict balance checks and partial read-only validation | complete response/task-shape contracts and delayed/unconfirmed outcomes |
+| Balance evidence | source/time and successful/stopped account observations | partial exception evidence, durable artifacts and task attribution limits |
+| Failure propagation | compiled method exit tests and explicit summaries | whole application/worker IPC lifecycle acceptance |
+| Persistent blocks | real SQLite state and guard tests | failure classes beyond balance/restriction, storage lifetime across runners |
+| Alerts | provider-result contracts and per-destination leases | real provider receipt, transient-failure escalation and recovery notifications |
+| Resume | real child CLI with synthetic saved sessions | current CN/HK primary endpoint and session compatibility |
+| Quiet operation | Logger local/worker routing tests | real multi-day duplicate/manual-intervention metrics |
+| Runtime budget | real supervisor and descendant tests | Linux runner verification; timeout persistence/notification policy |
+| Regional acceptance | none | independent authorized CN and HK sessions and multi-day observation |
+| Upstream maintenance | fork/remote and focused commits | update-review procedure and rollback trial |
+
+187 local tests are evidence for the listed scopes, not proof of every requirement. No live account, cloud earning job, actual notification delivery or multi-day acceptance has been performed. Keep the full original objective open.
