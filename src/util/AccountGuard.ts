@@ -1,6 +1,7 @@
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { BlockStateStore } from './BlockStateStore'
+import { acquireAccountLock } from './AccountLock'
 
 function storageFailure(): Error {
     return Object.assign(new Error('Account state storage is unavailable'), { code: 'STATE_STORAGE_FAILED' })
@@ -12,11 +13,13 @@ export async function runUnlessBlocked<T extends { skippedForBotWarning?: boolea
     run: () => Promise<T>,
     notify?: (store: BlockStateStore) => Promise<void>
 ): Promise<T> {
+    const release = acquireAccountLock(sessionPath, account)
     let store: BlockStateStore
     try {
         mkdirSync(sessionPath, { recursive: true, mode: 0o700 })
         store = new BlockStateStore(join(sessionPath, 'account-blocks.sqlite'))
     } catch {
+        release()
         throw storageFailure()
     }
     try {
@@ -62,6 +65,10 @@ export async function runUnlessBlocked<T extends { skippedForBotWarning?: boolea
         }
         return result
     } finally {
-        store.close()
+        try {
+            store.close()
+        } finally {
+            release()
+        }
     }
 }

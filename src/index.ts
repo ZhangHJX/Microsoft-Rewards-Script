@@ -55,7 +55,12 @@ interface AccountStats {
     balanceObservations?: { initial: BalanceObservation; final: BalanceObservation | null }
     error?: string
     errorCode?:
-        'BALANCE_UNAVAILABLE' | 'FLOW_FAILED' | 'ACCOUNT_RESTRICTED' | 'ACCOUNT_BLOCKED' | 'STATE_STORAGE_FAILED'
+        | 'BALANCE_UNAVAILABLE'
+        | 'FLOW_FAILED'
+        | 'ACCOUNT_RESTRICTED'
+        | 'ACCOUNT_BUSY'
+        | 'ACCOUNT_BLOCKED'
+        | 'STATE_STORAGE_FAILED'
 }
 
 interface AccountRunResult {
@@ -547,6 +552,7 @@ export class MicrosoftRewardsBot {
                     'code' in error &&
                     (error.code === 'BALANCE_UNAVAILABLE' ||
                         error.code === 'ACCOUNT_BLOCKED' ||
+                        error.code === 'ACCOUNT_BUSY' ||
                         error.code === 'STATE_STORAGE_FAILED')
                         ? error.code
                         : 'FLOW_FAILED'
@@ -555,9 +561,11 @@ export class MicrosoftRewardsBot {
                         ? 'Rewards balance is missing or invalid'
                         : errorCode === 'ACCOUNT_BLOCKED'
                           ? 'Account requires validated recovery'
-                          : errorCode === 'STATE_STORAGE_FAILED'
-                            ? 'Account state storage is unavailable'
-                            : 'Flow failed'
+                          : errorCode === 'ACCOUNT_BUSY'
+                            ? 'Account is already running'
+                            : errorCode === 'STATE_STORAGE_FAILED'
+                              ? 'Account state storage is unavailable'
+                              : 'Flow failed'
                 if (errorCode !== 'ACCOUNT_BLOCKED')
                     this.logger.error('main', 'ACCOUNT-ERROR', `${accountEmail}: ${errorCode} | ${errorMessage}`)
 

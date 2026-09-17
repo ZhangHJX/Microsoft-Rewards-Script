@@ -6,6 +6,7 @@ import { DatabaseSync } from 'node:sqlite'
 
 const require = createRequire(import.meta.url)
 let blocks
+let release
 try {
     const { values } = parseArgs({
         options: {
@@ -19,7 +20,9 @@ try {
     const { BlockStateStore } = require('../../dist/util/BlockStateStore.js')
     const { validateBlockedAccount } = require('../../dist/util/AccountRecovery.js')
     const { validateSavedDashboard } = require('../../dist/util/RecoveryDashboard.js')
+    const { acquireAccountLock } = require('../../dist/util/AccountLock.js')
     const directory = resolve(values['session-dir'])
+    release = acquireAccountLock(directory, values.account)
     const blockPath = join(directory, 'account-blocks.sqlite')
     let status = 'not_blocked'
     if (existsSync(blockPath)) {
@@ -51,5 +54,9 @@ try {
     console.log(JSON.stringify({ status: 'recovery_failed' }))
     process.exitCode = 1
 } finally {
-    blocks?.close()
+    try {
+        blocks?.close()
+    } finally {
+        release?.()
+    }
 }

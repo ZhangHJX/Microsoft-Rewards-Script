@@ -98,3 +98,26 @@ test('new and existing blocks invoke notification hook without repeating work', 
     assert.equal(runs, 1)
     assert.equal(notifications, 2)
 })
+
+test('guard prevents overlapping callbacks for one account and releases after completion', async t => {
+    const dir = directory(t)
+    let finish
+    let started
+    const ready = new Promise(resolve => {
+        started = resolve
+    })
+    const first = runUnlessBlocked(dir, 'a', async () => {
+        started()
+        return await new Promise(resolve => {
+            finish = resolve
+        })
+    })
+    await ready
+    await assert.rejects(
+        runUnlessBlocked(dir, 'a', async () => assert.fail('overlap')),
+        { code: 'ACCOUNT_BUSY' }
+    )
+    finish(undefined)
+    await first
+    assert.equal(await runUnlessBlocked(dir, 'a', async () => undefined), undefined)
+})
