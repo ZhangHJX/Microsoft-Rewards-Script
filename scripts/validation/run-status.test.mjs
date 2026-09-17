@@ -156,3 +156,33 @@ for (const mode of ['balance', 'generic', 'undefined', 'zero']) {
         assert.ok(!JSON.stringify({ results, logs }).includes('SECRET'))
     })
 }
+
+for (const skipped of [false, true]) {
+    test('account aggregation retains balance evidence; skipped=' + skipped, async () => {
+        const initial = { value: 100, source: 'dashboard', observedAt: '2026-09-17T00:00:00.000Z' }
+        const final = skipped ? null : { value: 103, source: 'flyout', observedAt: '2026-09-17T00:01:00.000Z' }
+        const method = loadMethod('runTasks', {
+            Locale_1: { resolveAccountLocale: () => ({ language: 'en', country: 'US', locale: 'en-US' }) },
+            Http_1: { default: class {} }
+        })
+        const results = await method.call(
+            {
+                config: { clusters: 2 },
+                userData: {},
+                utils: { getEmailUsername: () => 'synthetic' },
+                logger: { info() {}, warn() {}, error() {} },
+                Main: async () => ({
+                    initialPoints: 100,
+                    collectedPoints: skipped ? 0 : 3,
+                    skippedForBotWarning: skipped,
+                    balanceObservations: { initial, final }
+                })
+            },
+            [{ email: 'synthetic@example.invalid', geoLocale: 'US' }],
+            Date.now()
+        )
+        assert.ok(results[0].balanceObservations, 'account result must retain observations')
+        assert.deepEqual(JSON.parse(JSON.stringify(results[0].balanceObservations)), { initial, final })
+        assert.equal(results[0].success, !skipped)
+    })
+}

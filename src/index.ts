@@ -28,7 +28,7 @@ import HttpClient from './util/Http'
 import { sendDiscord, flushDiscordQueue } from './logging/Discord'
 import { sendNtfy, flushNtfyQueue } from './logging/Ntfy'
 import { sendTelegram, flushTelegramQueue } from './logging/Telegram'
-import type { DashboardData } from './interface/DashboardData'
+import type { BalanceObservation } from './browser/Balance'
 import type { AppDashboardData } from './interface/AppDashBoardData'
 import type { AppEarnablePoints } from './interface/Points'
 
@@ -49,6 +49,7 @@ interface AccountStats {
     collectedPoints: number | null
     duration: number
     success: boolean
+    balanceObservations?: { initial: BalanceObservation; final: BalanceObservation | null }
     error?: string
     errorCode?: 'BALANCE_UNAVAILABLE' | 'FLOW_FAILED' | 'ACCOUNT_RESTRICTED'
 }
@@ -57,6 +58,7 @@ interface AccountRunResult {
     initialPoints: number
     collectedPoints: number
     skippedForBotWarning?: boolean
+    balanceObservations: { initial: BalanceObservation; final: BalanceObservation | null }
 }
 
 const executionContext = new AsyncLocalStorage<ExecutionContext>()
@@ -463,7 +465,8 @@ export class MicrosoftRewardsBot {
                             duration: parseFloat(durationSeconds),
                             success: false,
                             error: 'Microsoft bot-score warning detected',
-                            errorCode: 'ACCOUNT_RESTRICTED'
+                            errorCode: 'ACCOUNT_RESTRICTED',
+                            balanceObservations: result.balanceObservations
                         })
 
                         this.logger.warn(
@@ -478,7 +481,8 @@ export class MicrosoftRewardsBot {
                             finalPoints: accountFinalPoints,
                             collectedPoints: collectedPoints,
                             duration: parseFloat(durationSeconds),
-                            success: true
+                            success: true,
+                            balanceObservations: result.balanceObservations
                         })
 
                         this.logger.info(
@@ -667,7 +671,7 @@ export class MicrosoftRewardsBot {
                     )
                 }
 
-                const data: DashboardData = await this.browser.func.getDashboardData()
+                const data = await this.browser.func.getDashboardData()
                 const hasBotScoreWarning =
                     Array.isArray(data.dashboard.userWarnings) &&
                     data.dashboard.userWarnings.some(warning => warning?.name === 'Fraud_UserWarning_BotScore_UX')
@@ -687,7 +691,8 @@ export class MicrosoftRewardsBot {
                         return {
                             initialPoints: availablePoints,
                             collectedPoints: 0,
-                            skippedForBotWarning: true
+                            skippedForBotWarning: true,
+                            balanceObservations: { initial: data.balanceObservation, final: null }
                         }
                     }
 
@@ -928,7 +933,8 @@ export class MicrosoftRewardsBot {
                     edgeBrowsingTask = null
                 }
 
-                const finalPoints = await this.browser.func.getCurrentPoints()
+                const finalData = await this.browser.func.getDashboardData()
+                const finalPoints = finalData.balanceObservation.value
                 const collectedPoints = finalPoints - initialPoints
 
                 this.logger.info(
@@ -939,7 +945,8 @@ export class MicrosoftRewardsBot {
 
                 return {
                     initialPoints,
-                    collectedPoints: collectedPoints || 0
+                    collectedPoints: collectedPoints || 0,
+                    balanceObservations: { initial: data.balanceObservation, final: finalData.balanceObservation }
                 }
             })
         } finally {
