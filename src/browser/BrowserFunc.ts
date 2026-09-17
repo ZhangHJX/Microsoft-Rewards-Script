@@ -13,6 +13,7 @@ import type { AppUserData } from '../interface/AppUserData'
 import type { AppEarnablePoints, BrowserEarnablePoints } from '../interface/Points'
 import type { AppDashboardData } from '../interface/AppDashBoardData'
 import { detectFlyoutBotWarning, mapFlyoutToDashboard, type RewardsFlyoutData } from './FlyoutDashboard'
+import { BalanceUnavailableError, requiredBalance } from './Balance'
 
 export default class BrowserFunc {
     private bot: MicrosoftRewardsBot
@@ -49,9 +50,14 @@ export default class BrowserFunc {
 
                     await this.applyResponseCookies(URLs.rewards.userInfoApi, response.headers['set-cookie'])
 
-                    if (response.data?.dashboard) return response.data
+                    if (response.data?.dashboard) {
+                        requiredBalance(response.data.dashboard.userStatus?.availablePoints)
+                        return response.data
+                    }
                     throw new Error('Dashboard data missing from API response')
                 } catch (error) {
+                    // A malformed balance is a data-contract failure, not a transient transport error.
+                    if (error instanceof BalanceUnavailableError) throw error
                     primaryError = error
                     if (attempt === 1) {
                         this.bot.logger.warn(
