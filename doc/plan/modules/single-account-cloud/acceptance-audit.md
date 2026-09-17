@@ -18,8 +18,8 @@
 | Alerts | provider-result contracts and per-destination leases | real provider receipt, transient-failure escalation and recovery notifications |
 | Resume | real child CLI with synthetic saved sessions | current CN/HK primary endpoint and session compatibility |
 | Quiet operation | Logger local/worker routing tests | real multi-day duplicate/manual-intervention metrics |
-| Runtime budget | real supervisor and descendant tests | Linux runner verification; timeout persistence/notification policy |
+| Runtime budget | real supervisor and descendant tests | DONE Linux run 35198757037; TODO timeout persistence/notification policy |
 | Regional acceptance | none | independent authorized CN and HK sessions and multi-day observation |
-| Upstream maintenance | fork/remote and focused commits | update-review procedure and rollback trial |
+| Upstream maintenance | fork/remote and focused commits | DONE documented procedure and local rollback trial; deployed rollback still pending |
 
-187 local tests are evidence for the listed scopes, not proof of every requirement. No live account, cloud earning job, actual notification delivery or multi-day acceptance has been performed. Keep the full original objective open.
+187 tests passed locally and in Linux CI run 35198757037; they are evidence for the listed scopes, not proof of every requirement. No live account, cloud earning job, actual notification delivery or multi-day acceptance has been performed. Keep the full original objective open.
