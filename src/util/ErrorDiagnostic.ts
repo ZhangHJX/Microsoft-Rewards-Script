@@ -64,12 +64,12 @@ ${error.stack || 'No stack trace available'}
             page.screenshot({ fullPage: true, type: 'png' })
         ])
 
-        await fs.mkdir(outputDir, { recursive: true })
+        await fs.mkdir(outputDir, { recursive: true, mode: 0o700 })
 
         await Promise.all([
-            fs.writeFile(path.join(outputDir, 'dump.html'), htmlContent),
-            fs.writeFile(path.join(outputDir, 'screenshot.png'), screenshotBuffer),
-            fs.writeFile(path.join(outputDir, 'error.txt'), errorLog)
+            fs.writeFile(path.join(outputDir, 'dump.html'), htmlContent, { mode: 0o600 }),
+            fs.writeFile(path.join(outputDir, 'screenshot.png'), screenshotBuffer, { mode: 0o600 }),
+            fs.writeFile(path.join(outputDir, 'error.txt'), errorLog, { mode: 0o600 })
         ])
 
         console.log(`Diagnostics saved to: ${outputDir}`)
@@ -89,7 +89,7 @@ export async function unknownPageDiagnostic(
     const outputDir = unknownPageOutputDir(rawUrl, capturedAt, platform)
 
     try {
-        await fs.mkdir(outputDir, { recursive: true })
+        await fs.mkdir(outputDir, { recursive: true, mode: 0o700 })
 
         const [htmlResult, screenshotResult] = await Promise.allSettled([
             page.content(),
@@ -113,14 +113,14 @@ export async function unknownPageDiagnostic(
         }
 
         const writes: Promise<void>[] = [
-            fs.writeFile(path.join(outputDir, 'metadata.json'), JSON.stringify(metadata, null, 2))
+            fs.writeFile(path.join(outputDir, 'metadata.json'), JSON.stringify(metadata, null, 2), { mode: 0o600 })
         ]
 
         if (htmlResult.status === 'fulfilled') {
-            writes.push(fs.writeFile(path.join(outputDir, 'page.html'), htmlResult.value))
+            writes.push(fs.writeFile(path.join(outputDir, 'page.html'), htmlResult.value, { mode: 0o600 }))
         }
         if (screenshotResult.status === 'fulfilled') {
-            writes.push(fs.writeFile(path.join(outputDir, 'screenshot.png'), screenshotResult.value))
+            writes.push(fs.writeFile(path.join(outputDir, 'screenshot.png'), screenshotResult.value, { mode: 0o600 }))
         }
 
         await Promise.all(writes)

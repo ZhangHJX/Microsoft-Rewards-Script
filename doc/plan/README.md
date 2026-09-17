@@ -22,3 +22,5 @@ Linux CI run 35198757037 passed all 187 tests. Next: address remaining items in 
 For each stage: reproduce the defect or failing acceptance test, implement the smallest coherent change, run affected regressions/build, review limitations, update this plan and operation log, commit and push. Never report an unexecuted check as passing.
 
 Latest verification: build and 187 tests pass on macOS and Linux (run 35198757037); see [runtime-budget evidence](../operation-log/2026-09-17-phase-8-runtime-budget.md). Earlier operation logs are historical snapshots, not the current checklist. The [code-disposition inventory](modules/single-account-cloud/code-disposition.md) records the initial audit and should be interpreted alongside current changes.
+
+Diagnostic privacy increment: raw capture now defaults off consistently with the example config; new capture files/directories use owner-only permissions. Build and 189 local tests pass. Raw opt-in captures are still sensitive; pre-existing files and general logs require separate review. See [phase evidence](../operation-log/2026-09-17-diagnostic-privacy.md).

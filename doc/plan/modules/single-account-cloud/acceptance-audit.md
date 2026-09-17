@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | Single account | initialization/count tests and Actions enforcement | complete actual deployment configuration |
 | Concurrent triggers | real-process SQLite account lock tests | stable cross-runner concurrency group and persistence setup |
-| Credentials/log confidentiality | no credentials committed; sanitized result errors | lower-level diagnostic/log audit and encrypted cloud state transport |
+| Credentials/log confidentiality | no credentials committed; sanitized result errors; raw diagnostics opt-in and new files/directories owner-only | lower-level diagnostic/log audit and encrypted cloud state transport |
 | Automatic authentication | upstream implementation retained | branch-specific login/session-recovery tests and real session expiry evidence |
 | Bounded recovery | token/version and timeout tests | login-specific budgets and actual interaction fallback |
 | Page/field changes | strict balance checks and partial read-only validation | complete response/task-shape contracts and delayed/unconfirmed outcomes |
@@ -22,4 +22,4 @@
 | Regional acceptance | none | independent authorized CN and HK sessions and multi-day observation |
 | Upstream maintenance | fork/remote and focused commits | DONE documented procedure and local rollback trial; deployed rollback still pending |
 
-187 tests passed locally and in Linux CI run 35198757037; they are evidence for the listed scopes, not proof of every requirement. No live account, cloud earning job, actual notification delivery or multi-day acceptance has been performed. Keep the full original objective open.
+189 tests passed locally; the previous 187-test baseline passed in Linux CI run 35198757037; they are evidence for the listed scopes, not proof of every requirement. No live account, cloud earning job, actual notification delivery or multi-day acceptance has been performed. Keep the full original objective open.

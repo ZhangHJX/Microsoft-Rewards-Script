@@ -252,7 +252,7 @@ const defaultConfig: Config = {
     headless: true,
     singleAccount: true,
     clusters: 1,
-    errorDiagnostics: true,
+    errorDiagnostics: false,
     ensureStreakProtection: true,
     autoClaimPunchcardRewards: false,
     contintueOnBotWarning: false,
