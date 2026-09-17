@@ -26,6 +26,7 @@ import { SearchManager } from './functions/activities/search/SearchManager'
 import type { Account } from './interface/Account'
 import HttpClient from './util/Http'
 import { runUnlessBlocked } from './util/AccountGuard'
+import { deliverBlockNotifications, type BlockNotificationDestination } from './logging/BlockNotifications'
 import { sendDiscord, flushDiscordQueue } from './logging/Discord'
 import { sendNtfy, flushNtfyQueue } from './logging/Ntfy'
 import { sendTelegram, flushTelegramQueue } from './logging/Telegram'
@@ -453,6 +454,26 @@ export class MicrosoftRewardsBot {
                             'Accept-Language': this.accountLocale.acceptLanguage
                         })
                         return await this.Main(account)
+                    },
+                    async store => {
+                        const destinations: BlockNotificationDestination[] = []
+                        const { discord, ntfy, telegram } = this.config.webhook
+                        if (discord?.enabled && discord.url)
+                            destinations.push({
+                                identity: `discord:${discord.url}`,
+                                send: content => sendDiscord(discord.url, content, 'warn')
+                            })
+                        if (ntfy?.enabled && ntfy.url)
+                            destinations.push({
+                                identity: `ntfy:${ntfy.url}:${ntfy.topic ?? ''}`,
+                                send: content => sendNtfy({ ...ntfy }, content, 'warn')
+                            })
+                        if (telegram?.enabled && telegram.botToken && telegram.chatId)
+                            destinations.push({
+                                identity: `telegram:${telegram.botToken}:${telegram.chatId}`,
+                                send: content => sendTelegram(telegram, content, 'warn')
+                            })
+                        await deliverBlockNotifications(store, accountEmail, destinations)
                     }
                 )
 

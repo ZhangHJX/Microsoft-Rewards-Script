@@ -65,3 +65,36 @@ test('blocked account does not affect another account', async t => {
     await runUnlessBlocked(dir, 'a', async () => ({ skippedForBotWarning: true }))
     assert.equal(await runUnlessBlocked(dir, 'b', async () => undefined), undefined)
 })
+
+test('new and existing blocks invoke notification hook without repeating work', async t => {
+    const dir = directory(t)
+    let notifications = 0
+    let runs = 0
+    const notify = async store => {
+        assert.ok(store.get('a'))
+        notifications++
+    }
+    await runUnlessBlocked(
+        dir,
+        'a',
+        async () => {
+            runs++
+            return { skippedForBotWarning: true }
+        },
+        notify
+    )
+    await assert.rejects(
+        runUnlessBlocked(
+            dir,
+            'a',
+            async () => {
+                runs++
+                return undefined
+            },
+            notify
+        ),
+        { code: 'ACCOUNT_BLOCKED' }
+    )
+    assert.equal(runs, 1)
+    assert.equal(notifications, 2)
+})

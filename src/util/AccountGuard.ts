@@ -9,7 +9,8 @@ function storageFailure(): Error {
 export async function runUnlessBlocked<T extends { skippedForBotWarning?: boolean } | undefined>(
     sessionPath: string,
     account: string,
-    run: () => Promise<T>
+    run: () => Promise<T>,
+    notify?: (store: BlockStateStore) => Promise<void>
 ): Promise<T> {
     let store: BlockStateStore
     try {
@@ -25,11 +26,13 @@ export async function runUnlessBlocked<T extends { skippedForBotWarning?: boolea
         } catch {
             throw storageFailure()
         }
-        if (block)
+        if (block) {
+            await notify?.(store)
             throw Object.assign(new Error('Account requires validated recovery'), {
                 code: 'ACCOUNT_BLOCKED',
                 reason: block.reason
             })
+        }
         let result: T
         try {
             result = await run()
@@ -42,6 +45,7 @@ export async function runUnlessBlocked<T extends { skippedForBotWarning?: boolea
             ) {
                 try {
                     store.block(account, 'BALANCE_UNAVAILABLE')
+                    await notify?.(store)
                 } catch {
                     throw storageFailure()
                 }
@@ -51,6 +55,7 @@ export async function runUnlessBlocked<T extends { skippedForBotWarning?: boolea
         if (result?.skippedForBotWarning) {
             try {
                 store.block(account, 'ACCOUNT_RESTRICTED')
+                await notify?.(store)
             } catch {
                 throw storageFailure()
             }

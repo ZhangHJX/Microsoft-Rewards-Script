@@ -24,6 +24,11 @@ export class BlockStateStore {
                 blocked_at TEXT NOT NULL,
                 notified INTEGER NOT NULL DEFAULT 0,
                 validation_token TEXT
+            );
+            CREATE TABLE IF NOT EXISTS block_deliveries (
+                account_key TEXT NOT NULL, revision TEXT NOT NULL, destination TEXT NOT NULL,
+                token TEXT NOT NULL, lease_until INTEGER NOT NULL, acknowledged INTEGER NOT NULL DEFAULT 0,
+                PRIMARY KEY(account_key, revision, destination)
             )`)
     }
 
@@ -91,6 +96,42 @@ export class BlockStateStore {
             this.db
                 .prepare('DELETE FROM account_blocks WHERE account_key = ? AND validation_token = ?')
                 .run(this.key(account), token).changes === 1
+        )
+    }
+
+    claimDelivery(account: string, revision: string, destination: string, now: number, leaseMs: number): string | null {
+        if (
+            !Number.isSafeInteger(now) ||
+            !Number.isSafeInteger(leaseMs) ||
+            leaseMs < 1 ||
+            leaseMs > 300000 ||
+            !destination
+        ) {
+            throw new Error('Invalid delivery lease')
+        }
+        const token = randomUUID()
+        const key = this.key(account)
+        const result = this.db
+            .prepare(
+                `INSERT INTO block_deliveries (account_key, revision, destination, token, lease_until)
+            SELECT ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM account_blocks WHERE account_key = ? AND revision = ?)
+            ON CONFLICT(account_key, revision, destination) DO UPDATE SET token = excluded.token, lease_until = excluded.lease_until
+            WHERE acknowledged = 0 AND lease_until <= ?`
+            )
+            .run(key, revision, destination, token, now + leaseMs, key, revision, now)
+        return result.changes === 1 ? token : null
+    }
+
+    finishDelivery(account: string, revision: string, destination: string, token: string, delivered: boolean): boolean {
+        const key = this.key(account)
+        return (
+            this.db
+                .prepare(
+                    `UPDATE block_deliveries SET acknowledged = ?, lease_until = 0, token = ''
+            WHERE account_key = ? AND revision = ? AND destination = ? AND token = ?
+            AND EXISTS (SELECT 1 FROM account_blocks WHERE account_key = ? AND revision = ?)`
+                )
+                .run(delivered === true ? 1 : 0, key, revision, destination, token, key, revision).changes === 1
         )
     }
 
