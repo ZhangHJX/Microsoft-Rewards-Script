@@ -30,3 +30,5 @@ Partial-failure increment: the initial validated observation is retained per acc
 State-transfer increment: consistent SQLite snapshots are authenticated and encrypted for one account; restore refuses existing state. Build and 205 local tests pass, including actual production store round trips. Cloud transport is not yet wired. See [design and boundaries](modules/single-account-cloud/state-transfer-design.md).
 
 State CLI increment: environment-secret export/import commands and exclusive ciphertext publication are tested in real child processes. Build and 214 local tests pass. Next: remote state transport and freshness/retention failure behavior before live deployment.
+
+Remote-state increment: dedicated-branch Contents API adapter now enforces ready/pending conditional revisions and no blind retries. Synthetic live GitHub round trip and conflict protection passed; temporary branch removed. Build and 225 local tests pass. Next: workflow orchestration, initial session provisioning and independent runner acceptance. See [remote protocol](modules/single-account-cloud/remote-state-design.md).
