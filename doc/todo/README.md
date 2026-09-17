@@ -2,11 +2,13 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: phase-1-complete; production-work-pending
+- status: phase-2-first-slice-complete; remaining-work-pending
 
 - TODO P1 — Introduce structured run results and correct exit-code aggregation; regression-test all-account failure and valid zero activity.
 - TODO P1 — Define a cloud entry point that rejects any account count other than one before side effects.
 - TODO P1 — Separate unavailable/invalid balance data from numeric zero and record the data source.
+- DONE P1 — Reject invalid flyout balances and preserve valid zero, with 27 parser tests.
+- TODO P1 — Validate primary dashboard balances and getCurrentPoints callers; attach source and observation time.
 - TODO P1 — Add persistent blocked states, bounded recovery, and deduplicated actionable notifications.
 - TODO P2 — Preserve automatic authentication coverage and define controlled resume after personal intervention.
 - TODO P2 — Validate session confidentiality, complete persistence, and same-account mutual exclusion in the chosen runtime.

@@ -2,7 +2,7 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: phase-1-complete; live-validation-pending
+- status: phase-2-first-slice-complete; live-validation-pending
 
 This fork preserves TheNetsky's v4 compatibility work and adds a small, reviewable set of reliability changes. The initial baseline is `d0f07d74a0ed4dda127855d6e3dde98bf4c89d6e` (package version 4.3.2).
 
@@ -14,6 +14,8 @@ This fork preserves TheNetsky's v4 compatibility work and adds a small, reviewab
 - [Initialization record](operation-log/2026-09-17-initialization.md)
 
 ## Current status
+
+Current: the flyout balance defects are fixed with 27 parser tests; 36 existing offline tests also pass. See [phase 2](operation-log/2026-09-17-phase-2.md). Primary dashboard validation and process failure propagation remain pending. Phase 1 results below are historical.
 
 DONE: Create the public fork and a separate `codex/single-account-cloud` development branch.
 

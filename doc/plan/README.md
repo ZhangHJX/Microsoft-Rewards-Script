@@ -2,9 +2,11 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: phase-1-complete; later-stages-unverified
+- status: phase-2-first-slice-complete; later-stages-unverified
 
 ## 当前执行计划（2026-09-17）
+
+最新进展：已修复真实 FlyoutDashboard 映射器的余额缺失误判，63 项测试和构建通过。下一步补主 dashboard 路径的余额校验及失败传播。[阶段 2 记录](../operation-log/2026-09-17-phase-2.md)。下方阶段 1 范围为历史记录。
 
 当前推进离线技术验证，不运行真实账号，也不新增自动赚分工作流。以下里程碑记录需求方向，不等于全部已实现或批准运行。第一阶段不修改原有登录、搜索和领取执行器。
 

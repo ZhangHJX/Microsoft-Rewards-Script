@@ -132,7 +132,7 @@ export function mapFlyoutToDashboard(data: RewardsFlyoutData): DashboardData {
         ...flyout,
         userStatus: {
             ...flyoutStatus,
-            availablePoints: numberOrFallback(flyoutStatus.availablePoints, userInfo.balance),
+            availablePoints: requiredBalance(flyoutStatus.availablePoints, userInfo.balance),
             lifetimePoints: numberOrFallback(flyoutStatus.lifetimePoints, 0),
             lifetimePointsRedeemed: numberOrFallback(flyoutStatus.lifetimePointsRedeemed, 0),
             lifetimeGivingPoints: numberOrFallback(flyoutStatus.lifetimeGivingPoints, userInfo.lifetimeGivingPoints),
@@ -164,6 +164,13 @@ export function mapFlyoutToDashboard(data: RewardsFlyoutData): DashboardData {
 function sumCounterMaximum(counters?: Array<{ pointProgressMax: number }>): number | null {
     if (!counters?.length) return null
     return counters.reduce((total, counter) => total + Math.max(0, Number(counter.pointProgressMax) || 0), 0)
+}
+
+function requiredBalance(primary: unknown, fallback: unknown): number {
+    for (const value of [primary, fallback]) {
+        if (typeof value === 'number' && Number.isSafeInteger(value) && value >= 0) return value
+    }
+    throw Object.assign(new Error('Rewards balance is missing or invalid'), { code: 'BALANCE_UNAVAILABLE' })
 }
 
 function numberOrFallback(primary: unknown, fallback: unknown): number {
