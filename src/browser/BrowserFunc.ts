@@ -13,7 +13,7 @@ import type { AppUserData } from '../interface/AppUserData'
 import type { AppEarnablePoints, BrowserEarnablePoints } from '../interface/Points'
 import type { AppDashboardData } from '../interface/AppDashBoardData'
 import { detectFlyoutBotWarning, mapFlyoutToDashboard, type RewardsFlyoutData } from './FlyoutDashboard'
-import { BalanceUnavailableError, requiredBalance } from './Balance'
+import { BalanceUnavailableError, observeDashboard, type ObservedDashboardData } from './Balance'
 
 export default class BrowserFunc {
     private bot: MicrosoftRewardsBot
@@ -26,7 +26,7 @@ export default class BrowserFunc {
         this.bot = bot
     }
 
-    async getDashboardData(cookies?: Cookie[]): Promise<DashboardData> {
+    async getDashboardData(cookies?: Cookie[]): Promise<ObservedDashboardData> {
         const fingerprintHeaders = { ...(this.bot.fingerprint?.headers ?? {}) }
         delete fingerprintHeaders['Cookie']
         delete fingerprintHeaders['cookie']
@@ -51,8 +51,7 @@ export default class BrowserFunc {
                     await this.applyResponseCookies(URLs.rewards.userInfoApi, response.headers['set-cookie'])
 
                     if (response.data?.dashboard) {
-                        requiredBalance(response.data.dashboard.userStatus?.availablePoints)
-                        return response.data
+                        return observeDashboard(response.data, 'dashboard')
                     }
                     throw new Error('Dashboard data missing from API response')
                 } catch (error) {
@@ -84,7 +83,7 @@ export default class BrowserFunc {
     private async getFlyoutDashboardData(
         cookies: Cookie[] | undefined,
         fingerprintHeaders: Record<string, string>
-    ): Promise<DashboardData> {
+    ): Promise<ObservedDashboardData> {
         try {
             const response = await this.bot.http.request<RewardsFlyoutData>({
                 url: URLs.bing.rewardsFlyoutUserInfo,
@@ -107,7 +106,7 @@ export default class BrowserFunc {
                 'GET-DASHBOARD-DATA',
                 `Using partial Bing flyout dashboard | suspectedLimited=${detection.likelyLimited} | botMarkers=${detection.hasBotProfileMarkers} | activitiesCollapsed=${detection.hasCollapsedActivities}`
             )
-            return mapFlyoutToDashboard(response.data)
+            return observeDashboard(mapFlyoutToDashboard(response.data), 'flyout')
         } catch (error) {
             this.bot.logger.error(
                 this.bot.isMobile,

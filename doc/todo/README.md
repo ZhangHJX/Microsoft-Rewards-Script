@@ -10,7 +10,8 @@
 - TODO P1 — Separate unavailable/invalid balance data from numeric zero and record the data source.
 - DONE P1 — Reject invalid flyout balances and preserve valid zero, with 27 parser tests.
 - DONE P1 — Validate primary dashboard balances and getCurrentPoints error propagation; 32 integration tests pass.
-- TODO P1 — Attach balance source and observation time.
+- DONE P1 — Attach validated source/time metadata to both dashboard response paths.
+- TODO P1 — Retain before/after observations in account results.
 - TODO P1 — Add persistent blocked states, bounded recovery, and deduplicated actionable notifications.
 - TODO P2 — Preserve automatic authentication coverage and define controlled resume after personal intervention.
 - TODO P2 — Validate session confidentiality, complete persistence, and same-account mutual exclusion in the chosen runtime.

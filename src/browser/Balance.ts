@@ -1,3 +1,19 @@
+import type { DashboardData } from '../interface/DashboardData'
+
+export interface BalanceObservation {
+    value: number
+    source: 'dashboard' | 'flyout'
+    // Local response-validation time, not the service's ledger-update time.
+    observedAt: string
+}
+
+export type ObservedDashboardData = DashboardData & { balanceObservation: BalanceObservation }
+
+export function observeDashboard(data: DashboardData, source: BalanceObservation['source']): ObservedDashboardData {
+    const value = requiredBalance(data.dashboard.userStatus?.availablePoints)
+    return { ...data, balanceObservation: { value, source, observedAt: new Date().toISOString() } }
+}
+
 export class BalanceUnavailableError extends Error {
     readonly code = 'BALANCE_UNAVAILABLE'
 

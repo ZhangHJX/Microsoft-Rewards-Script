@@ -95,3 +95,28 @@ for (const validFallback of [true, false]) {
         assert.equal(calls, 3)
     })
 }
+
+for (const source of ['dashboard', 'flyout']) {
+    test('records local observation metadata for ' + source + ' without trusting payload metadata', async () => {
+        const forged = { value: 999, source: 'forged', observedAt: '2000-01-01T00:00:00.000Z' }
+        const data =
+            source === 'dashboard'
+                ? { dashboard: { userStatus: { availablePoints: 0 } }, balanceObservation: forged }
+                : {
+                      userInfo: { isRewardsUser: true, profile: { attributes: {} }, balance: 0 },
+                      flyoutResult: { userStatus: { isRewardsUser: true } },
+                      balanceObservation: forged
+                  }
+        const { browser, requests } = harness(data)
+        const before = Date.now()
+        const result =
+            source === 'dashboard' ? await browser.getDashboardData() : await browser.getFlyoutDashboardData([], {})
+        const after = Date.now()
+        assert.equal(result.balanceObservation.value, 0)
+        assert.equal(result.balanceObservation.source, source)
+        assert.ok(Date.parse(result.balanceObservation.observedAt) >= before)
+        assert.ok(Date.parse(result.balanceObservation.observedAt) <= after)
+        assert.equal(data.balanceObservation, forged)
+        assert.equal(requests.length, 1)
+    })
+}
