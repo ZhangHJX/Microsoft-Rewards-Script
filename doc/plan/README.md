@@ -12,13 +12,13 @@ The target remains the [confirmed single-account cloud requirements](modules/sin
 | Balance reliability | DONE: primary/flyout strict numeric validation; unknown failures rejected | DONE: source/time on dashboard reads; DONE: retain successful/stopped-account observations; TODO: partial-failure observations, durable evidence and complete data-shape validation |
 | Result propagation | DONE: exit selection, explicit summaries, nullable account failures and fixed codes | TODO: auth-specific classification, true process/IPC validation, GUI nullable-total review |
 | Single-account boundary | Not implemented | TODO: validate exactly one account before side effects and define stable concurrency identity |
-| Recovery and notifications | Not implemented | TODO: persistent blocked state, bounded recovery, deduplicated alerts, controlled resume |
+| Recovery and notifications | DONE: tested persistent state store; runtime integration pending | TODO: persistent blocked state, bounded recovery, deduplicated alerts, controlled resume |
 | Session/runtime | Not verified | TODO: confidential persistence, runtime suitability and resource budget |
 | Regional acceptance | Neither market tested | TODO: separate CN/HK evidence and multi-day completion/intervention metrics |
 | Upstream maintenance | Fork and upstream remote preserved | TODO: documented update review and rollback validation |
 
-Next: define and implement persisted failure-state and controlled-resume behavior with offline tests, then integrate with the account entry point. Review login/recovery integration against the same contracts. Obtain required user account/environment input when live acceptance is reached, rather than treating offline coverage as completion.
+Next: integrate the tested block store with the account entry point and prove blocked accounts do not invoke Main; then connect validation-only resume and notification acknowledgements. Review login/recovery integration against the same contracts. Obtain required user account/environment input when live acceptance is reached, rather than treating offline coverage as completion.
 
 For each stage: reproduce the defect or failing acceptance test, implement the smallest coherent change, run affected regressions/build, review limitations, update this plan and operation log, commit and push. Never report an unexecuted check as passing.
 
-Latest verification: build and 114 tests pass; see [result-observation evidence](../operation-log/2026-09-17-phase-4-result-observations.md). Earlier operation logs are historical snapshots, not the current checklist. The [code-disposition inventory](modules/single-account-cloud/code-disposition.md) records the initial audit and should be interpreted alongside current changes.
+Latest verification: build and 123 tests pass; see [block-store evidence](../operation-log/2026-09-17-phase-5-block-store.md). Earlier operation logs are historical snapshots, not the current checklist. The [code-disposition inventory](modules/single-account-cloud/code-disposition.md) records the initial audit and should be interpreted alongside current changes.
