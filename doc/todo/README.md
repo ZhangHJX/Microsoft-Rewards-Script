@@ -2,7 +2,9 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: implementation-in-progress; full-goal-open
+- status: paused-by-user; full-goal-open
+
+暂停期间不执行下列任务；详见[暂停交接](../plan/modules/single-account-cloud/pause-checkpoint.md)。
 
 - TODO P1 — Provision the first real CN session; independent synthetic runner transfer is verified.
 - TODO P1 — Verify actual Actions overlap handling and bounded deployment; concurrency and runtime budgets are now configured.

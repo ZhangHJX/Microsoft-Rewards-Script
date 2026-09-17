@@ -2,7 +2,9 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: implementation-in-progress; full-goal-not-achieved
+- status: paused-by-user; full-goal-not-achieved
+
+用户已要求暂停。当前已完成、待验证、未完成及恢复起点见[暂停交接](modules/single-account-cloud/pause-checkpoint.md)。等待用户明确恢复，不自动执行后续工作。
 
 The target remains the [confirmed single-account cloud requirements](modules/single-account-cloud/requirements.md). Offline tests do not establish live compatibility. One account per deployment and independent CN/HK acceptance remain requirements; no multi-account scope expansion is planned.
 
