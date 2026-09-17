@@ -13,7 +13,7 @@ The target remains the [confirmed single-account cloud requirements](modules/sin
 | Result propagation | DONE: exit selection, explicit summaries, nullable account failures and fixed codes | TODO: auth-specific classification, true process/IPC validation, GUI nullable-total review |
 | Single-account boundary | DONE: early account/process count guard, forced in Actions | DONE: shared-directory account lock including recovery; TODO: cross-runner scheduling concurrency |
 | Recovery and notifications | DONE: persistent store and account-entry guard; bounded recovery controller and read-only command tested; per-destination block notifications integrated; quiet ordinary log routing implemented; real sessions pending | TODO: persistent blocked state, bounded recovery, deduplicated alerts, controlled resume |
-| Session/runtime | Not verified | TODO: confidential persistence, runtime suitability and resource budget |
+| Session/runtime | DONE: bounded supervisor and encrypted local SQLite transfer | TODO: cloud transport/retention/freshness, deployment and runtime suitability |
 | Regional acceptance | Neither market tested | TODO: separate CN/HK evidence and multi-day completion/intervention metrics |
 | Upstream maintenance | DONE: fork/remotes, update procedure and isolated rollback rehearsal | TODO: actual future-upstream merge and deployed rollback acceptance |
 
@@ -26,3 +26,5 @@ Latest verification: build and 187 tests pass on macOS and Linux (run 3519875703
 Diagnostic privacy increment: raw capture now defaults off consistently with the example config; new capture files/directories use owner-only permissions. Build and 189 local tests pass. Raw opt-in captures are still sensitive; pre-existing files and general logs require separate review. See [phase evidence](../operation-log/2026-09-17-diagnostic-privacy.md).
 
 Partial-failure increment: the initial validated observation is retained per account even if later execution throws; final balance and gains remain unknown. Build and 192 local tests pass. See [evidence](../operation-log/2026-09-17-partial-balance-evidence.md).
+
+State-transfer increment: consistent SQLite snapshots are authenticated and encrypted for one account; restore refuses existing state. Build and 205 local tests pass, including actual production store round trips. Cloud transport is not yet wired. See [design and boundaries](modules/single-account-cloud/state-transfer-design.md).
