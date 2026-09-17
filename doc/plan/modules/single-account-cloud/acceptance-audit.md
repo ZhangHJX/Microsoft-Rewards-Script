@@ -12,7 +12,7 @@
 | Automatic authentication | upstream implementation retained | branch-specific login/session-recovery tests and real session expiry evidence |
 | Bounded recovery | token/version and timeout tests | login-specific budgets and actual interaction fallback |
 | Page/field changes | strict balance checks and partial read-only validation | complete response/task-shape contracts and delayed/unconfirmed outcomes |
-| Balance evidence | source/time and successful/stopped account observations | partial exception evidence, durable artifacts and task attribution limits |
+| Balance evidence | source/time and successful/stopped account observations; initial evidence retained on later exceptions | durable artifacts, terminal-read evidence on cleanup failure and task attribution limits |
 | Failure propagation | compiled method exit tests and explicit summaries | whole application/worker IPC lifecycle acceptance |
 | Persistent blocks | real SQLite state and guard tests | failure classes beyond balance/restriction, storage lifetime across runners |
 | Alerts | provider-result contracts and per-destination leases | real provider receipt, transient-failure escalation and recovery notifications |
@@ -22,4 +22,4 @@
 | Regional acceptance | none | independent authorized CN and HK sessions and multi-day observation |
 | Upstream maintenance | fork/remote and focused commits | DONE documented procedure and local rollback trial; deployed rollback still pending |
 
-189 tests passed locally; the previous 187-test baseline passed in Linux CI run 35198757037; they are evidence for the listed scopes, not proof of every requirement. No live account, cloud earning job, actual notification delivery or multi-day acceptance has been performed. Keep the full original objective open.
+192 tests passed locally; the previous 189-test baseline passed in Linux CI run 35199310948; they are evidence for the listed scopes, not proof of every requirement. No live account, cloud earning job, actual notification delivery or multi-day acceptance has been performed. Keep the full original objective open.

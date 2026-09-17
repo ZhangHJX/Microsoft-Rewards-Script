@@ -440,6 +440,7 @@ export class MicrosoftRewardsBot {
 
             const accountStartTime = Date.now()
             const accountEmail = account.email
+            const progress: { initial: BalanceObservation | null } = { initial: null }
             this.userData.userName = this.utils.getEmailUsername(accountEmail)
             this.userData.timezoneOffset = String(new Date().getTimezoneOffset())
 
@@ -465,7 +466,13 @@ export class MicrosoftRewardsBot {
                         this.http = new HttpClient(account.proxy, {
                             'Accept-Language': this.accountLocale.acceptLanguage
                         })
-                        return await this.Main(account)
+                        return await this.Main(account, observation => {
+                            progress.initial = {
+                                value: observation.value,
+                                source: observation.source,
+                                observedAt: observation.observedAt
+                            }
+                        })
                     },
                     async store => {
                         const destinations: BlockNotificationDestination[] = []
@@ -571,13 +578,14 @@ export class MicrosoftRewardsBot {
 
                 accountStats.push({
                     email: accountEmail,
-                    initialPoints: null,
+                    initialPoints: progress.initial?.value ?? null,
                     finalPoints: null,
                     collectedPoints: null,
                     duration: parseFloat(durationSeconds),
                     success: false,
                     error: errorMessage,
-                    errorCode
+                    errorCode,
+                    ...(progress.initial ? { balanceObservations: { initial: progress.initial, final: null } } : {})
                 })
             }
         }
@@ -638,7 +646,10 @@ export class MicrosoftRewardsBot {
         return session
     }
 
-    async Main(account: Account): Promise<AccountRunResult> {
+    async Main(
+        account: Account,
+        onInitialBalance?: (observation: BalanceObservation) => void
+    ): Promise<AccountRunResult> {
         const accountEmail = account.email
         this.logger.info('main', 'FLOW', `Starting session for ${accountEmail}`)
 
@@ -724,6 +735,7 @@ export class MicrosoftRewardsBot {
                 }
 
                 const data = await this.browser.func.getDashboardData()
+                onInitialBalance?.(data.balanceObservation)
                 const hasBotScoreWarning =
                     Array.isArray(data.dashboard.userWarnings) &&
                     data.dashboard.userWarnings.some(warning => warning?.name === 'Fraud_UserWarning_BotScore_UX')

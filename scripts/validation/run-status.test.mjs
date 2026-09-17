@@ -245,3 +245,80 @@ for (const count of [0, 1, 2]) {
         assert.equal(warned, count === 1)
     })
 }
+
+for (const value of [0, 100]) {
+    test('partial failures retain initial evidence without leaking it to the next account: ' + value, async () => {
+        const initial = { value, source: 'dashboard', observedAt: '2026-09-17T00:00:00.000Z' }
+        const method = loadMethod('runTasks', {
+            Locale_1: { resolveAccountLocale: () => ({ language: 'en', country: 'US', locale: 'en-US' }) },
+            Http_1: { default: class {} }
+        })
+        const results = await method.call(
+            {
+                config: { clusters: 2 },
+                userData: {},
+                utils: { getEmailUsername: () => 'synthetic' },
+                logger: { info() {}, warn() {}, error() {} },
+                waitBeforeNextAccount: async () => {},
+                Main: async (account, onInitialBalance) => {
+                    if (account.email.startsWith('first')) onInitialBalance?.(initial)
+                    throw Object.assign(new Error('SECRET_RESPONSE'), { code: 'BALANCE_UNAVAILABLE' })
+                }
+            },
+            ['first', 'second'].map(name => ({ email: name + '@example.invalid', geoLocale: 'US' })),
+            Date.now()
+        )
+        assert.equal(results[0].initialPoints, value)
+        assert.deepEqual(JSON.parse(JSON.stringify(results[0].balanceObservations)), { initial, final: null })
+        assert.equal(results[1].initialPoints, null)
+        assert.equal(results[1].balanceObservations, undefined)
+        for (const result of results) {
+            assert.equal(result.finalPoints, null)
+            assert.equal(result.collectedPoints, null)
+            assert.equal(result.success, false)
+            assert.equal(result.errorCode, 'BALANCE_UNAVAILABLE')
+        }
+        assert.ok(!JSON.stringify(results).includes('SECRET'))
+    })
+}
+
+test('Main publishes validated initial observation before a later dashboard processing failure', async () => {
+    const initial = { value: 100, source: 'dashboard', observedAt: '2026-09-17T00:00:00.000Z' }
+    const observations = []
+    let closed = false
+    const method = loadMethod('Main', {
+        AbortController,
+        executionContext: { run: (_context, callback) => callback() },
+        Locale_1: {
+            normalizeCountry: () => {
+                throw new Error('synthetic later failure')
+            }
+        }
+    })
+    const context = {
+        config: { experimental: {}, activities: {}, workers: {} },
+        logger: { info() {}, debug() {} },
+        browserFactory: {
+            createBrowser: async () => ({ context: { newPage: async () => ({}), cookies: async () => [] } })
+        },
+        login: { login: async () => {} },
+        browser: {
+            func: {
+                checkpointActiveSession: async () => {},
+                closeBrowser: async () => {
+                    closed = true
+                },
+                getDashboardData: async () => ({
+                    balanceObservation: initial,
+                    dashboard: { userWarnings: [], userProfile: { attributes: { country: 'US' } } }
+                })
+            }
+        }
+    }
+    await assert.rejects(
+        method.call(context, { email: 'synthetic@example.invalid' }, observation => observations.push(observation)),
+        /synthetic later failure/
+    )
+    assert.deepEqual(observations, [initial])
+    assert.equal(closed, true)
+})
