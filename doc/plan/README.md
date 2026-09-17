@@ -2,9 +2,11 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: phase-2-balance-validation-complete; later-stages-unverified
+- status: phase-3-exit-selection-complete; later-stages-unverified
 
 ## 当前执行计划（2026-09-17）
+
+阶段 3：账号失败、worker 失败或缺失结果会选取失败退出码，103 项测试通过。下一步修正汇总信息；真实进程与 IPC 验证仍未完成。见[阶段记录](../operation-log/2026-09-17-phase-3-exit-status.md)。
 
 最新进展：主面板和备用面板均已校验余额，错误能传到 getCurrentPoints 调用方，95 项测试和构建通过。下一步核查账号及 worker 失败如何影响进程退出状态；来源和观察时间仍待补充。[阶段 2 最新记录](../operation-log/2026-09-17-phase-2-primary.md)。下方阶段 1 范围为历史记录。
 

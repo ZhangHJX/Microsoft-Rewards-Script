@@ -21,6 +21,7 @@
         "lint:fix": "eslint . --fix",
         "test:log-parser": "node --test scripts/api/logParser.test.js",
         "test:offline": "node --test scripts/api/logParser.test.js scripts/validation/inspect-fixture.test.mjs",
+        "test:run-status": "npm run build && node --test scripts/validation/run-status.test.mjs",
         "test:upstream-parser": "npm run build && node --test scripts/validation/upstream-parser.test.mjs scripts/validation/dashboard-balance.test.mjs",
         "validate:fixture": "node scripts/validation/inspect-fixture.mjs --config config/validation.example.json",
         "format": "prettier --write .",

@@ -2,9 +2,10 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: phase-2-balance-validation-complete; remaining-work-pending
+- status: phase-3-exit-selection-complete; remaining-work-pending
 
-- TODO P1 — Introduce structured run results and correct exit-code aggregation; regression-test all-account failure and valid zero activity.
+- DONE P1 — Correct account-failure exit-code selection; compiled-method tests cover failure, zero activity and missing reports.
+- TODO P1 — Introduce structured run results, truthful summaries and end-to-end process/IPC verification.
 - TODO P1 — Define a cloud entry point that rejects any account count other than one before side effects.
 - TODO P1 — Separate unavailable/invalid balance data from numeric zero and record the data source.
 - DONE P1 — Reject invalid flyout balances and preserve valid zero, with 27 parser tests.

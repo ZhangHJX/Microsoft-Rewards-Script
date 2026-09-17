@@ -360,7 +360,11 @@ export class MicrosoftRewardsBot {
 
                 await flushAllWebhooks()
 
-                process.exit(hadWorkerFailure ? 1 : 0)
+                const failed =
+                    hadWorkerFailure ||
+                    allAccountStats.length !== this.accounts.length ||
+                    allAccountStats.some(stats => !stats.success)
+                process.exit(failed ? 1 : 0)
             }
         }
 
@@ -392,7 +396,7 @@ export class MicrosoftRewardsBot {
                 }
 
                 await flushAllWebhooks()
-                process.exit(0)
+                process.exit(stats.length !== chunk.length || stats.some(result => !result.success) ? 1 : 0)
             } catch (error) {
                 this.logger.error(
                     'main',
@@ -532,7 +536,7 @@ export class MicrosoftRewardsBot {
             )
 
             await flushAllWebhooks()
-            process.exit(0)
+            process.exit(accountStats.some(result => !result.success) ? 1 : 0)
         }
 
         return accountStats

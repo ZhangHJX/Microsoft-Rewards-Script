@@ -2,7 +2,7 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: phase-2-balance-validation-complete; live-validation-pending
+- status: phase-3-exit-selection-complete; live-validation-pending
 
 This fork preserves TheNetsky's v4 compatibility work and adds a small, reviewable set of reliability changes. The initial baseline is `d0f07d74a0ed4dda127855d6e3dde98bf4c89d6e` (package version 4.3.2).
 
@@ -15,7 +15,7 @@ This fork preserves TheNetsky's v4 compatibility work and adds a small, reviewab
 
 ## Current status
 
-Current: primary and flyout balance validation is implemented; 95 tests pass and the full build passes. See [primary dashboard results](operation-log/2026-09-17-phase-2-primary.md). Process exit propagation and observation metadata remain pending. Phase 1 results below are historical.
+Current: primary/flyout balance validation and account-failure exit selection are implemented; 103 tests and the full build pass. See [exit-status evidence](operation-log/2026-09-17-phase-3-exit-status.md). Structured summaries, observation metadata and end-to-end process validation remain pending. Phase 1 results below are historical.
 
 DONE: Create the public fork and a separate `codex/single-account-cloud` development branch.
 
