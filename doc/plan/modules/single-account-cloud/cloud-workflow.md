@@ -22,3 +22,5 @@ Configuration for eventual activation:
 The workflow is currently on the development branch. Before manual dispatch, make it discoverable from the repository default branch (or deliberately change the fork default while keeping v4 as the upstream tracking branch). This has not been done yet. Do not claim the manual workflow has run merely because offline CI passes.
 
 Evidence: 241 local tests, including real SQLite restore/run/publish orchestration with synthetic execution, account/environment boundary checks, CLI missing-secret failure and real supervisor child-isolation/signal tests. Independent Actions runner state restoration, initial provisioning, live authentication, regional compatibility, automatic scheduling, runtime costs and failure notifications remain acceptance work.
+
+Independent synthetic runner acceptance passed on 2026-09-17 in run 35201883404: the consumer restored and updated producer state through the production orchestrator, then verified the new remote state. This replaces the earlier unverified cross-runner item for synthetic data only. First real region is CN; email/login/provisioning remain pending.
