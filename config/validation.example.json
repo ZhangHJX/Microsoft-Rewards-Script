@@ -1,0 +1,10 @@
+{
+    "schemaVersion": 1,
+    "mode": "offline",
+    "capabilities": {
+        "network": false,
+        "login": false,
+        "rewardActions": false
+    },
+    "maxFixtureBytes": 65536
+}

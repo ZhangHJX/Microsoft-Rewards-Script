@@ -1,0 +1,8 @@
+{
+    "schemaVersion": 1,
+    "synthetic": true,
+    "market": "HK",
+    "panel": "modern",
+    "initial": { "userStatus": { "availablePoints": 0 } },
+    "final": { "userStatus": { "availablePoints": 0 } }
+}
