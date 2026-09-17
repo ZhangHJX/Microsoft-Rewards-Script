@@ -68,11 +68,13 @@ export class BlockStateStore {
         )
     }
 
-    beginValidation(account: string): string | null {
+    beginValidation(account: string, expectedRevision?: string): string | null {
         const token = randomUUID()
+        const revision = expectedRevision ?? this.get(account)?.revision
+        if (!revision) return null
         const result = this.db
-            .prepare('UPDATE account_blocks SET validation_token = ? WHERE account_key = ?')
-            .run(token, this.key(account))
+            .prepare('UPDATE account_blocks SET validation_token = ? WHERE account_key = ? AND revision = ?')
+            .run(token, this.key(account), revision)
         return result.changes === 1 ? token : null
     }
 
