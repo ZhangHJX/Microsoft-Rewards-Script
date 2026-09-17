@@ -346,6 +346,12 @@ export class MicrosoftRewardsBot {
             )
 
             if (this.activeWorkers <= 0) {
+                const failed =
+                    hadWorkerFailure ||
+                    allAccountStats.length !== this.accounts.length ||
+                    allAccountStats.some(stats => !stats.success)
+                const accountsFailed = allAccountStats.filter(stats => !stats.success).length
+                const accountsMissing = Math.max(0, this.accounts.length - allAccountStats.length)
                 const totalCollectedPoints = allAccountStats.reduce((sum, s) => sum + s.collectedPoints, 0)
                 const totalInitialPoints = allAccountStats.reduce((sum, s) => sum + s.initialPoints, 0)
                 const totalFinalPoints = allAccountStats.reduce((sum, s) => sum + s.finalPoints, 0)
@@ -354,16 +360,12 @@ export class MicrosoftRewardsBot {
                 this.logger.info(
                     'main',
                     'RUN-END',
-                    `Completed all accounts | accountsProcessed=${allAccountStats.length} | pointsGained=${totalCollectedPoints} | previousBalance=${totalInitialPoints} | currentBalance=${totalFinalPoints} | runtimeMinutes=${totalDurationMinutes}`,
-                    'green'
+                    `Run finished | accountsProcessed=${allAccountStats.length} | pointsGained=${failed ? 'unknown' : totalCollectedPoints} | previousBalance=${failed ? 'unknown' : totalInitialPoints} | currentBalance=${failed ? 'unknown' : totalFinalPoints} | runtimeMinutes=${totalDurationMinutes} | status=${failed ? 'failed' : 'success'} | accountsFailed=${accountsFailed} | accountsMissing=${accountsMissing}`,
+                    failed ? 'red' : 'green'
                 )
 
                 await flushAllWebhooks()
 
-                const failed =
-                    hadWorkerFailure ||
-                    allAccountStats.length !== this.accounts.length ||
-                    allAccountStats.some(stats => !stats.success)
                 process.exit(failed ? 1 : 0)
             }
         }
@@ -523,6 +525,8 @@ export class MicrosoftRewardsBot {
         }
 
         if (this.config.clusters <= 1 && cluster.isPrimary) {
+            const accountsFailed = accountStats.filter(stats => !stats.success).length
+            const failed = accountsFailed > 0
             const totalCollectedPoints = accountStats.reduce((sum, s) => sum + s.collectedPoints, 0)
             const totalInitialPoints = accountStats.reduce((sum, s) => sum + s.initialPoints, 0)
             const totalFinalPoints = accountStats.reduce((sum, s) => sum + s.finalPoints, 0)
@@ -531,8 +535,8 @@ export class MicrosoftRewardsBot {
             this.logger.info(
                 'main',
                 'RUN-END',
-                `Completed all accounts | accountsProcessed=${accountStats.length} | pointsGained=${totalCollectedPoints} | previousBalance=${totalInitialPoints} | currentBalance=${totalFinalPoints} | runtimeMinutes=${totalDurationMinutes}`,
-                'green'
+                `Run finished | accountsProcessed=${accountStats.length} | pointsGained=${failed ? 'unknown' : totalCollectedPoints} | previousBalance=${failed ? 'unknown' : totalInitialPoints} | currentBalance=${failed ? 'unknown' : totalFinalPoints} | runtimeMinutes=${totalDurationMinutes} | status=${failed ? 'failed' : 'success'} | accountsFailed=${accountsFailed} | accountsMissing=0`,
+                failed ? 'red' : 'green'
             )
 
             await flushAllWebhooks()

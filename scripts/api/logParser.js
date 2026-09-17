@@ -105,7 +105,7 @@ const RE = {
         /^Snapshot complete \| offers=(\d+) \| reportable=(\d+) \| streaks=(\d+) \| streakProtectionEnabled=(true|false|null) \| streakProtectionRemainingDays=(\d+|null) \| streakCounter=(\d+|null) \| level=([^|]+) \| account=(\S+@\S+)$/,
     accountEnd:
         /^Completed account: (\S+) \| pointsGained=(-?\d+) \| previousBalance=(\d+) \| currentBalance=(\d+) \| durationSeconds=([\d.]+)/,
-    runEnd: /^Completed all accounts \| accountsProcessed=(\d+) \| pointsGained=(-?\d+) \| previousBalance=(\d+) \| currentBalance=(\d+) \| runtimeMinutes=([\d.]+)/,
+    runEnd: /^(?:Completed all accounts|Run finished) \| accountsProcessed=(\d+) \| pointsGained=(-?\d+|unknown) \| previousBalance=(\d+|unknown) \| currentBalance=(\d+|unknown) \| runtimeMinutes=([\d.]+)(?: \| status=(success|failed) \| accountsFailed=(\d+) \| accountsMissing=(\d+))?/,
     accountError: /^(\S+@\S+): ([\s\S]+)$/,
     flowFailed: /flow failed for (\S+@\S+):/i,
     accountDelay: /^Waiting ([\d.]+) seconds before starting the next account(?: \((\S+@\S+)\))?$/,
@@ -484,10 +484,13 @@ export function applyLogToRunState(state, entry) {
             if ((m = msg.match(RE.runEnd))) {
                 state.totals = {
                     accountsProcessed: Number(m[1]),
-                    collected: Number(m[2]),
-                    oldTotal: Number(m[3]),
-                    newTotal: Number(m[4]),
-                    runtimeMinutes: Number(m[5])
+                    collected: m[2] === 'unknown' ? null : Number(m[2]),
+                    oldTotal: m[3] === 'unknown' ? null : Number(m[3]),
+                    newTotal: m[4] === 'unknown' ? null : Number(m[4]),
+                    runtimeMinutes: Number(m[5]),
+                    status: m[6] ?? null,
+                    accountsFailed: m[7] === undefined ? null : Number(m[7]),
+                    accountsMissing: m[8] === undefined ? null : Number(m[8])
                 }
                 state.finished = true
                 state.pendingDelay = null
@@ -509,7 +512,7 @@ function accountCollected(a) {
 
 export function summarizeRunState(state) {
     const accounts = state.order.map(email => state.accounts[email])
-    const collected = state.totals?.collected ?? accounts.reduce((sum, a) => sum + accountCollected(a), 0)
+    const collected = state.totals ? state.totals.collected : accounts.reduce((sum, a) => sum + accountCollected(a), 0)
 
     const current = state.currentEmail ? state.accounts[state.currentEmail] : null
     return {

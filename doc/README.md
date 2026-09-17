@@ -2,7 +2,7 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: phase-3-exit-selection-complete; live-validation-pending
+- status: phase-3-summary-complete; live-validation-pending
 
 This fork preserves TheNetsky's v4 compatibility work and adds a small, reviewable set of reliability changes. The initial baseline is `d0f07d74a0ed4dda127855d6e3dde98bf4c89d6e` (package version 4.3.2).
 
@@ -26,3 +26,5 @@ DONE: Establish an offline baseline: build passes, 36 offline tests and 4 upstre
 Run `npm run validate:fixture -- --fixture tests/fixtures/validation/cn.json` for a synthetic observation. The validation configuration applies only to this checker, not the upstream application. No Rewards workflow or credentials have been added, and no live account has been tested.
 
 The default `v4` branch remains the upstream baseline. Review changes on the development branch before merging. Preserve the upstream license and copyright notices. Keep account credentials, cookies, tokens, and diagnostic account data out of source control, including this documentation tree.
+
+Current update: explicit run summaries and nullable aggregate totals are implemented; 106 tests and build pass. Next: account-result contracts and failure classification. See [summary evidence](operation-log/2026-09-17-phase-3-summary.md).

@@ -22,6 +22,7 @@ function loadMethod(name, globals) {
 
 for (const success of [true, false]) {
     test('single process propagates account success=' + success + ' with zero points', async () => {
+        const logs = []
         const exits = []
         const globals = {
             process: { exit: code => exits.push(code) },
@@ -35,7 +36,7 @@ for (const success of [true, false]) {
             config: { clusters: 1 },
             userData: {},
             utils: { getEmailUsername: () => 'synthetic' },
-            logger: { info() {}, warn() {}, error() {} },
+            logger: { info: (...args) => logs.push(args), warn() {}, error() {} },
             Main: async () => {
                 if (!success) throw new Error('synthetic failure')
                 return { initialPoints: 0, collectedPoints: 0 }
@@ -43,6 +44,12 @@ for (const success of [true, false]) {
         }
         await method.call(context, [{ email: 'synthetic@example.invalid', geoLocale: 'US' }], Date.now())
         assert.deepEqual(exits, [success ? 0 : 1])
+        const summary = logs.find(args => args[1] === 'RUN-END')
+        assert.ok(summary)
+        assert.ok(summary[2].includes('status=' + (success ? 'success' : 'failed')))
+        assert.ok(summary[2].includes('accountsFailed=' + (success ? 0 : 1)))
+        assert.ok(summary[2].includes('previousBalance=' + (success ? '0' : 'unknown')))
+        assert.equal(summary[3], success ? 'green' : 'red')
     })
     test('worker propagates reported account success=' + success, async () => {
         let callback

@@ -2,7 +2,7 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: phase-3-exit-selection-complete; remaining-work-pending
+- status: phase-3-summary-complete; remaining-work-pending
 
 - DONE P1 — Correct account-failure exit-code selection; compiled-method tests cover failure, zero activity and missing reports.
 - TODO P1 — Introduce structured run results, truthful summaries and end-to-end process/IPC verification.
@@ -20,3 +20,5 @@
 All priorities are implementation work, not claims of completed functionality. See the [plan](../plan/README.md) and [requirements](../plan/modules/single-account-cloud/requirements.md).
 
 Completed baseline: build and 40 tests pass. Next: prioritize actual balance-parser contracts and unknown handling. See the [phase report](../operation-log/2026-09-17-phase-1.md).
+
+Current update: explicit run summaries and nullable aggregate totals are implemented; 106 tests and build pass. Next: account-result contracts and failure classification. See [summary evidence](../operation-log/2026-09-17-phase-3-summary.md).

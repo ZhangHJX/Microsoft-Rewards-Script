@@ -2,7 +2,7 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: phase-3-exit-selection-complete; later-stages-unverified
+- status: phase-3-summary-complete; later-stages-unverified
 
 ## 当前执行计划（2026-09-17）
 
@@ -56,3 +56,5 @@ See [requirements](modules/single-account-cloud/requirements.md) for acceptance 
 ## Phase 1 reassessment
 
 Build and 40 tests passed. Two characterization tests reproduce upstream balance defects, which remain open. See the [phase report](../operation-log/2026-09-17-phase-1.md). Next priority: actual parser contracts and caller handling of unknown balances; live compatibility remains untested.
+
+Current update: explicit run summaries and nullable aggregate totals are implemented; 106 tests and build pass. Next: account-result contracts and failure classification. See [summary evidence](../operation-log/2026-09-17-phase-3-summary.md).

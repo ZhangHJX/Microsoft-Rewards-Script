@@ -361,3 +361,40 @@ test('marks Edge browsing partial when the local maximum ends before Microsoft r
     assert.equal(finished.reportsCompleted, 6)
     assert.equal(finished.reportsTotal, 6)
 })
+
+for (const status of ['success', 'failed']) {
+    test('parses explicit run outcome ' + status + ' and unknown aggregate balances', () => {
+        const state = createRunState()
+        const failed = status === 'failed'
+        apply(
+            state,
+            line(
+                'main',
+                'RUN-END',
+                `Run finished | accountsProcessed=1 | pointsGained=${failed ? 'unknown' : '0'} | previousBalance=${failed ? 'unknown' : '0'} | currentBalance=${failed ? 'unknown' : '0'} | runtimeMinutes=0.1 | status=${status} | accountsFailed=${failed ? 1 : 0} | accountsMissing=0`
+            )
+        )
+        assert.equal(state.finished, true)
+        assert.equal(state.totals.status, status)
+        assert.equal(state.totals.accountsFailed, failed ? 1 : 0)
+        assert.equal(state.totals.accountsMissing, 0)
+        assert.equal(state.totals.oldTotal, failed ? null : 0)
+        assert.equal(state.totals.newTotal, failed ? null : 0)
+        assert.equal(state.totals.collected, failed ? null : 0)
+        assert.equal(summarizeRunState(state).collected, failed ? null : 0)
+    })
+}
+
+test('legacy run end remains readable without inventing a success status', () => {
+    const state = createRunState()
+    apply(
+        state,
+        line(
+            'main',
+            'RUN-END',
+            'Completed all accounts | accountsProcessed=1 | pointsGained=0 | previousBalance=0 | currentBalance=0 | runtimeMinutes=1'
+        )
+    )
+    assert.equal(state.finished, true)
+    assert.equal(state.totals.status, null)
+})
