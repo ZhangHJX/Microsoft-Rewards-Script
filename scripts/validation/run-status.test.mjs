@@ -17,7 +17,10 @@ const botClass = source.statements.find(node => ts.isClassDeclaration(node) && n
 function loadMethod(name, globals) {
     const method = botClass.members.find(node => node.name?.getText(source) === name)
     assert.ok(method, name + ' must exist in the production class')
-    return vm.runInNewContext('(class { ' + method.getText(source) + ' })', globals).prototype[name]
+    return vm.runInNewContext('(class { ' + method.getText(source) + ' })', {
+        AccountGuard_1: { runUnlessBlocked: async (_path, _account, run) => run() },
+        ...globals
+    }).prototype[name]
 }
 
 for (const success of [true, false]) {
@@ -186,3 +189,39 @@ for (const skipped of [false, true]) {
         assert.equal(results[0].success, !skipped)
     })
 }
+
+test('account entry does not construct HTTP client or invoke Main while blocked', async () => {
+    let calls = 0
+    const method = loadMethod('runTasks', {
+        AccountGuard_1: {
+            runUnlessBlocked: async () => {
+                throw Object.assign(new Error('blocked'), { code: 'ACCOUNT_BLOCKED' })
+            }
+        },
+        Locale_1: { resolveAccountLocale: () => ({ language: 'en', country: 'US', locale: 'en-US' }) },
+        Http_1: {
+            default: class {
+                constructor() {
+                    calls++
+                }
+            }
+        }
+    })
+    const result = await method.call(
+        {
+            config: { clusters: 2 },
+            userData: {},
+            utils: { getEmailUsername: () => 'synthetic' },
+            logger: { info() {}, warn() {}, error() {} },
+            Main: async () => {
+                calls++
+                return undefined
+            }
+        },
+        [{ email: 'synthetic@example.invalid', geoLocale: 'US' }],
+        Date.now()
+    )
+    assert.equal(calls, 0)
+    assert.equal(result[0].errorCode, 'ACCOUNT_BLOCKED')
+    assert.equal(result[0].success, false)
+})

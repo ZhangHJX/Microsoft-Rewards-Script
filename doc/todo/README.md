@@ -13,7 +13,8 @@
 - DONE P1 — Attach validated source/time metadata to both dashboard response paths.
 - DONE P1 — Retain before/after observations in normal and warning-stopped account results.
 - TODO P1 — Preserve partial observations on exceptions and retain durable diagnostic evidence.
-- TODO P1 — Add persistent blocked states, bounded recovery, and deduplicated actionable notifications.
+- DONE P1 — Persist confirmed blocks and stop blocked accounts before HTTP construction/Main.
+- TODO P1 — Connect validation-only recovery, bounded recovery policy and deduplicated actionable notifications.
 - TODO P2 — Preserve automatic authentication coverage and define controlled resume after personal intervention.
 - TODO P2 — Validate session confidentiality, complete persistence, and same-account mutual exclusion in the chosen runtime.
 - TODO P2 — Establish separate CN/HK compatibility evidence after offline checks pass.

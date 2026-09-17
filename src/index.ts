@@ -25,6 +25,7 @@ import { SearchManager } from './functions/activities/search/SearchManager'
 
 import type { Account } from './interface/Account'
 import HttpClient from './util/Http'
+import { runUnlessBlocked } from './util/AccountGuard'
 import { sendDiscord, flushDiscordQueue } from './logging/Discord'
 import { sendNtfy, flushNtfyQueue } from './logging/Ntfy'
 import { sendTelegram, flushTelegramQueue } from './logging/Telegram'
@@ -51,7 +52,8 @@ interface AccountStats {
     success: boolean
     balanceObservations?: { initial: BalanceObservation; final: BalanceObservation | null }
     error?: string
-    errorCode?: 'BALANCE_UNAVAILABLE' | 'FLOW_FAILED' | 'ACCOUNT_RESTRICTED'
+    errorCode?:
+        'BALANCE_UNAVAILABLE' | 'FLOW_FAILED' | 'ACCOUNT_RESTRICTED' | 'ACCOUNT_BLOCKED' | 'STATE_STORAGE_FAILED'
 }
 
 interface AccountRunResult {
@@ -443,11 +445,16 @@ export class MicrosoftRewardsBot {
                     }`
                 )
 
-                this.http = new HttpClient(account.proxy, {
-                    'Accept-Language': this.accountLocale.acceptLanguage
-                })
-
-                const result: AccountRunResult | undefined = await this.Main(account)
+                const result: AccountRunResult | undefined = await runUnlessBlocked(
+                    this.config.sessionPath,
+                    accountEmail,
+                    async () => {
+                        this.http = new HttpClient(account.proxy, {
+                            'Accept-Language': this.accountLocale.acceptLanguage
+                        })
+                        return await this.Main(account)
+                    }
+                )
 
                 const durationSeconds = ((Date.now() - accountStartTime) / 1000).toFixed(1)
 
@@ -510,12 +517,21 @@ export class MicrosoftRewardsBot {
                     typeof error === 'object' &&
                     error !== null &&
                     'code' in error &&
-                    error.code === 'BALANCE_UNAVAILABLE'
-                        ? 'BALANCE_UNAVAILABLE'
+                    (error.code === 'BALANCE_UNAVAILABLE' ||
+                        error.code === 'ACCOUNT_BLOCKED' ||
+                        error.code === 'STATE_STORAGE_FAILED')
+                        ? error.code
                         : 'FLOW_FAILED'
                 const errorMessage =
-                    errorCode === 'BALANCE_UNAVAILABLE' ? 'Rewards balance is missing or invalid' : 'Flow failed'
-                this.logger.error('main', 'ACCOUNT-ERROR', `${accountEmail}: ${errorCode} | ${errorMessage}`)
+                    errorCode === 'BALANCE_UNAVAILABLE'
+                        ? 'Rewards balance is missing or invalid'
+                        : errorCode === 'ACCOUNT_BLOCKED'
+                          ? 'Account requires validated recovery'
+                          : errorCode === 'STATE_STORAGE_FAILED'
+                            ? 'Account state storage is unavailable'
+                            : 'Flow failed'
+                if (errorCode !== 'ACCOUNT_BLOCKED')
+                    this.logger.error('main', 'ACCOUNT-ERROR', `${accountEmail}: ${errorCode} | ${errorMessage}`)
 
                 accountStats.push({
                     email: accountEmail,
