@@ -225,3 +225,23 @@ test('account entry does not construct HTTP client or invoke Main while blocked'
     assert.equal(result[0].errorCode, 'ACCOUNT_BLOCKED')
     assert.equal(result[0].success, false)
 })
+
+for (const count of [0, 1, 2]) {
+    test('initialization enforces single account before warnings; count=' + count, async () => {
+        let warned = false
+        const method = loadMethod('initialize', {
+            Load_1: { loadAccounts: () => Array.from({ length: count }, () => ({})) },
+            ExecutionScope_1: require('../../dist/util/ExecutionScope.js'),
+            process: { env: { GITHUB_ACTIONS: 'true' } }
+        })
+        const context = {
+            config: { clusters: 1, singleAccount: false },
+            warnExperimental: () => {
+                warned = true
+            }
+        }
+        if (count === 1) await method.call(context)
+        else await assert.rejects(method.call(context), { code: 'INVALID_ACCOUNT_SCOPE' })
+        assert.equal(warned, count === 1)
+    })
+}

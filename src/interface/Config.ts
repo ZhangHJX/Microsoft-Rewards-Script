@@ -1,6 +1,7 @@
 export interface Config {
     sessionPath: string
     headless: boolean
+    singleAccount: boolean
     clusters: number
     errorDiagnostics: boolean
     ensureStreakProtection: boolean
@@ -76,6 +77,7 @@ export interface ConfigActivities {
 }
 
 export interface ConfigWebhook {
+    forwardLogs?: boolean
     discord?: WebhookDiscordConfig
     ntfy?: WebhookNtfyConfig
     telegram?: WebhookTelegramConfig

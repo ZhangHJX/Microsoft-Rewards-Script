@@ -104,6 +104,8 @@
             "levels": ["error"],
             "keywords": ["starting account", "select number", "collected", "Fraud_UserWarning_BotScore_UX"],
             "regexPatterns": []
-        }
-    }
+        },
+        "forwardLogs": false
+    },
+    "singleAccount": true
 }

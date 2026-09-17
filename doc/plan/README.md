@@ -11,14 +11,14 @@ The target remains the [confirmed single-account cloud requirements](modules/sin
 | Offline baseline | DONE: fixture CLI, build, test commands | Maintain focused regressions |
 | Balance reliability | DONE: primary/flyout strict numeric validation; unknown failures rejected | DONE: source/time on dashboard reads; DONE: retain successful/stopped-account observations; TODO: partial-failure observations, durable evidence and complete data-shape validation |
 | Result propagation | DONE: exit selection, explicit summaries, nullable account failures and fixed codes | TODO: auth-specific classification, true process/IPC validation, GUI nullable-total review |
-| Single-account boundary | Not implemented | TODO: validate exactly one account before side effects and define stable concurrency identity |
-| Recovery and notifications | DONE: persistent store and account-entry guard; bounded recovery controller and read-only command tested; per-destination block notifications integrated; real sessions/quiet routing pending | TODO: persistent blocked state, bounded recovery, deduplicated alerts, controlled resume |
+| Single-account boundary | DONE: early account/process count guard, forced in Actions | TODO: stable concurrency identity and mutual exclusion |
+| Recovery and notifications | DONE: persistent store and account-entry guard; bounded recovery controller and read-only command tested; per-destination block notifications integrated; quiet ordinary log routing implemented; real sessions pending | TODO: persistent blocked state, bounded recovery, deduplicated alerts, controlled resume |
 | Session/runtime | Not verified | TODO: confidential persistence, runtime suitability and resource budget |
 | Regional acceptance | Neither market tested | TODO: separate CN/HK evidence and multi-day completion/intervention metrics |
 | Upstream maintenance | Fork and upstream remote preserved | TODO: documented update review and rollback validation |
 
-Next: add explicit reliability-mode notification routing (ordinary log forwarding opt-in), then early single-account configuration validation and runtime acceptance review. Review login/recovery integration against the same contracts. Obtain required user account/environment input when live acceptance is reached, rather than treating offline coverage as completion.
+Next: implement same-account mutual exclusion and execution-budget handling, then audit runtime acceptance and identify required real-environment inputs. Review login/recovery integration against the same contracts. Obtain required user account/environment input when live acceptance is reached, rather than treating offline coverage as completion.
 
 For each stage: reproduce the defect or failing acceptance test, implement the smallest coherent change, run affected regressions/build, review limitations, update this plan and operation log, commit and push. Never report an unexecuted check as passing.
 
-Latest verification: build and 160 tests pass; see [block-notification evidence](../operation-log/2026-09-17-phase-6-block-notifications.md). Earlier operation logs are historical snapshots, not the current checklist. The [code-disposition inventory](modules/single-account-cloud/code-disposition.md) records the initial audit and should be interpreted alongside current changes.
+Latest verification: build and 176 tests pass; see [scope/routing evidence](../operation-log/2026-09-17-phase-7-scope-and-quiet.md). Earlier operation logs are historical snapshots, not the current checklist. The [code-disposition inventory](modules/single-account-cloud/code-disposition.md) records the initial audit and should be interpreted alongside current changes.

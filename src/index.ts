@@ -26,6 +26,7 @@ import { SearchManager } from './functions/activities/search/SearchManager'
 import type { Account } from './interface/Account'
 import HttpClient from './util/Http'
 import { runUnlessBlocked } from './util/AccountGuard'
+import { assertExecutionScope } from './util/ExecutionScope'
 import { deliverBlockNotifications, type BlockNotificationDestination } from './logging/BlockNotifications'
 import { sendDiscord, flushDiscordQueue } from './logging/Discord'
 import { sendNtfy, flushNtfyQueue } from './logging/Ntfy'
@@ -238,6 +239,11 @@ export class MicrosoftRewardsBot {
 
     async initialize(): Promise<void> {
         this.accounts = loadAccounts()
+        assertExecutionScope(
+            this.accounts,
+            this.config.clusters,
+            this.config.singleAccount !== false || process.env.GITHUB_ACTIONS === 'true'
+        )
         this.warnExperimental()
     }
 
@@ -315,6 +321,7 @@ export class MicrosoftRewardsBot {
                 const log = msg.__ipcLog
                 if (log && typeof log.content === 'string') {
                     const { webhook } = this.config
+                    if (webhook.forwardLogs !== true) return
                     const { content, level } = log
 
                     if (webhook.discord?.enabled && webhook.discord.url) {

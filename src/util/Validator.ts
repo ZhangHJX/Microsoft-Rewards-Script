@@ -74,6 +74,7 @@ const AccountCountrySchema = z
     )
 
 const WebhookSchema = z.object({
+    forwardLogs: z.boolean().default(false),
     discord: z
         .object({
             enabled: z.boolean(),
@@ -102,6 +103,7 @@ const WebhookSchema = z.object({
 })
 
 export const ConfigSchema = z.object({
+    singleAccount: z.boolean().default(true),
     sessionPath: z.string(),
     headless: z.boolean(),
     clusters: z.number().int().nonnegative(),
@@ -248,6 +250,7 @@ export const AccountSchema = z.object({
 const defaultConfig: Config = {
     sessionPath: 'sessions',
     headless: true,
+    singleAccount: true,
     clusters: 1,
     errorDiagnostics: true,
     ensureStreakProtection: true,
@@ -303,6 +306,7 @@ const defaultConfig: Config = {
         regexPatterns: []
     },
     webhook: {
+        forwardLogs: false,
         webhookLogFilter: {
             enabled: false,
             mode: 'whitelist',
