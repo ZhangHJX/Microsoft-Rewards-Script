@@ -30,7 +30,8 @@
         "clear-sessions": "node ./scripts/main/clearSessions.js",
         "manual-login": "node ./scripts/main/manualLogin.js",
         "open-session": "node ./scripts/main/browserSession.js -email",
-        "test:reliability": "npm run build && node --test scripts/api/logParser.test.js scripts/validation/*.test.mjs"
+        "test:reliability": "npm run build && node --test scripts/api/logParser.test.js scripts/validation/*.test.mjs",
+        "recover:account": "node scripts/main/recover-account.mjs"
     },
     "keywords": [
         "Bing Rewards",
