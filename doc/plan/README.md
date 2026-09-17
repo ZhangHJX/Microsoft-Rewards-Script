@@ -28,3 +28,5 @@ Diagnostic privacy increment: raw capture now defaults off consistently with the
 Partial-failure increment: the initial validated observation is retained per account even if later execution throws; final balance and gains remain unknown. Build and 192 local tests pass. See [evidence](../operation-log/2026-09-17-partial-balance-evidence.md).
 
 State-transfer increment: consistent SQLite snapshots are authenticated and encrypted for one account; restore refuses existing state. Build and 205 local tests pass, including actual production store round trips. Cloud transport is not yet wired. See [design and boundaries](modules/single-account-cloud/state-transfer-design.md).
+
+State CLI increment: environment-secret export/import commands and exclusive ciphertext publication are tested in real child processes. Build and 214 local tests pass. Next: remote state transport and freshness/retention failure behavior before live deployment.

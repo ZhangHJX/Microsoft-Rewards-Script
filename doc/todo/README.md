@@ -2,28 +2,17 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: phase-3-summary-complete; remaining-work-pending
+- status: implementation-in-progress; full-goal-open
 
-- DONE P1 — Correct account-failure exit-code selection; compiled-method tests cover failure, zero activity and missing reports.
-- TODO P1 — Introduce structured run results, truthful summaries and end-to-end process/IPC verification.
-- DONE P1 — Reject invalid account/process counts at initialization, forced in GitHub Actions.
-- DONE P1 — Shared-directory account lock protects execution and recovery.
-- TODO P1 — Enforce hard runtime budget and cross-runner scheduling concurrency.
-- TODO P1 — Separate unavailable/invalid balance data from numeric zero and record the data source.
-- DONE P1 — Reject invalid flyout balances and preserve valid zero, with 27 parser tests.
-- DONE P1 — Validate primary dashboard balances and getCurrentPoints error propagation; 32 integration tests pass.
-- DONE P1 — Attach validated source/time metadata to both dashboard response paths.
-- DONE P1 — Retain before/after observations in normal and warning-stopped account results.
-- TODO P1 — Preserve partial observations on exceptions and retain durable diagnostic evidence.
-- DONE P1 — Persist confirmed blocks and stop blocked accounts before HTTP construction/Main.
-- TODO P1 — Connect validation-only recovery, bounded recovery policy and deduplicated actionable notifications.
-- TODO P2 — Preserve automatic authentication coverage and define controlled resume after personal intervention.
-- TODO P2 — Validate session confidentiality, complete persistence, and same-account mutual exclusion in the chosen runtime.
-- TODO P2 — Establish separate CN/HK compatibility evidence after offline checks pass.
-- TODO P2 — Add an upstream-update review procedure with focused regression checks and rollback.
+- TODO P1 — Wire encrypted state CLI into remote storage with latest-state selection, retention loss detection and publication failure handling.
+- TODO P1 — Define cross-trigger Actions concurrency and bounded deployment; verify state survives independent runners.
+- TODO P1 — Cover automatic authentication/session recovery and real expiry; classify unsupported challenges and bounded failures.
+- TODO P1 — Finish response/task contracts, durable result evidence and whole-process/IPC acceptance.
+- TODO P1 — Complete lower-level log confidentiality audit and runtime-timeout notification policy.
+- TODO P2 — Verify real notification delivery, recovery alerts and transient-failure escalation.
+- TODO P2 — Obtain separate CN/HK live evidence and multi-day runtime/completion/intervention metrics.
+- TODO P2 — Verify deployed rollback and a future upstream update through the documented procedure.
 
-All priorities are implementation work, not claims of completed functionality. See the [plan](../plan/README.md) and [requirements](../plan/modules/single-account-cloud/requirements.md).
+DONE: account boundary; shared-directory lock; validated balances/source/time; initial evidence on partial failures; explicit failed summaries; persistent blocks; bounded read-only recovery; per-destination notification acknowledgement; quiet normal forwarding; bounded process supervisor; opt-in private raw diagnostics; local encrypted state transfer and CLI.
 
-Completed baseline: build and 40 tests pass. Next: prioritize actual balance-parser contracts and unknown handling. See the [phase report](../operation-log/2026-09-17-phase-1.md).
-
-Current update: explicit run summaries and nullable aggregate totals are implemented; 106 tests and build pass. Next: account-result contracts and failure classification. See [summary evidence](../operation-log/2026-09-17-phase-3-summary.md).
+Current local verification: build and 214 tests pass. Tests are scoped evidence, not real account or deployed acceptance. The [plan](../plan/README.md), [acceptance audit](../plan/modules/single-account-cloud/acceptance-audit.md) and [requirements](../plan/modules/single-account-cloud/requirements.md) remain authoritative. Historical operation logs retain earlier test counts.

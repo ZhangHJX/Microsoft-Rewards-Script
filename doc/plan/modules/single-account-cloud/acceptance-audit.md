@@ -22,4 +22,4 @@
 | Regional acceptance | none | independent authorized CN and HK sessions and multi-day observation |
 | Upstream maintenance | fork/remote and focused commits | DONE documented procedure and local rollback trial; deployed rollback still pending |
 
-205 tests passed locally; the previous 192-test baseline passed in Linux CI run 35199552905; they are evidence for the listed scopes, not proof of every requirement. No live account, cloud earning job, actual notification delivery or multi-day acceptance has been performed. Keep the full original objective open.
+214 tests passed locally; the previous 205-test baseline passed in Linux CI run 35200016723; they are evidence for the listed scopes, not proof of every requirement. No live account, cloud earning job, actual notification delivery or multi-day acceptance has been performed. Keep the full original objective open.
