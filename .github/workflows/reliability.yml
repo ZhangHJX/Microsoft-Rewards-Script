@@ -21,13 +21,18 @@ on:
             - 'tsconfig.json'
             - '.github/workflows/reliability.yml'
     workflow_dispatch:
+        inputs:
+            state_rehearsal:
+                description: Run synthetic state transfer across independent runners
+                type: boolean
+                default: false
 
 permissions:
     contents: read
 
 concurrency:
     group: offline-reliability-${{ github.event.pull_request.number || github.ref }}
-    cancel-in-progress: true
+    cancel-in-progress: false
 
 jobs:
     offline:
@@ -45,3 +50,65 @@ jobs:
               run: npm ci --ignore-scripts --no-audit --no-fund
             - name: Build and run synthetic reliability tests
               run: npm run test:reliability
+
+    state-export:
+        needs: offline
+        if: github.repository == 'ZhangHJX/Microsoft-Rewards-Script' && github.ref == 'refs/heads/codex/single-account-cloud' && (github.event_name == 'workflow_dispatch' && inputs.state_rehearsal || github.event_name == 'push' && contains(github.event.head_commit.message, '[state-rehearsal]'))
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  persist-credentials: false
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+              with:
+                  node-version: 24
+                  cache: npm
+            - run: npm ci --ignore-scripts --no-audit --no-fund
+            - run: npm run build
+            - name: Publish synthetic state from first runner
+              run: node scripts/validation/remote-runner-rehearsal.mjs export
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
+
+    state-consume:
+        needs: state-export
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  persist-credentials: false
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+              with:
+                  node-version: 24
+                  cache: npm
+            - run: npm ci --ignore-scripts --no-audit --no-fund
+            - run: npm run build
+            - name: Restore and update state on independent runner
+              run: node scripts/validation/remote-runner-rehearsal.mjs consume
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
+
+    state-cleanup:
+        needs: [state-export, state-consume]
+        if: always() && needs.state-export.result != 'skipped'
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  persist-credentials: false
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+              with:
+                  node-version: 24
+            - name: Remove synthetic state branch
+              run: node scripts/validation/remote-runner-rehearsal.mjs cleanup
+              env:
+                  GITHUB_TOKEN: ${{ github.token }}
