@@ -8,9 +8,9 @@ This fork follows TheNetsky v4, baseline d0f07d74a0ed4dda127855d6e3dde98bf4c89d6
 
 ## Current state
 
-Implemented: primary/flyout balance validation, failed-account exit selection, explicit run summaries, nullable failed-account balances and fixed failure codes. Dashboard reads also attach local source/time metadata. Successful and stopped-account results retain their observations. A persistent block-state guard is integrated before account HTTP construction and Main. The bounded recovery controller and standalone read-only command are tested with synthetic sessions; real-session compatibility and notifications remain pending. Build and 149 tests pass. These include isolated compiled-method tests, not real account execution or operating-system worker validation.
+Implemented: primary/flyout balance validation, failed-account exit selection, explicit run summaries, nullable failed-account balances and fixed failure codes. Dashboard reads also attach local source/time metadata. Successful and stopped-account results retain their observations. A persistent block-state guard is integrated before account HTTP construction and Main. The bounded recovery controller and standalone read-only command are tested with synthetic sessions; real-session compatibility and notifications remain pending. Notification senders now return confirmed success/failure; persisted deduplication integration remains pending. Build and 155 tests pass. These include isolated compiled-method tests, not real account execution or operating-system worker validation.
 
-[Current plan](plan/README.md), [requirements](plan/modules/single-account-cloud/requirements.md), [code disposition](plan/modules/single-account-cloud/code-disposition.md), [priorities](todo/README.md), [latest evidence](operation-log/2026-09-17-phase-5-recovery-command.md).
+[Current plan](plan/README.md), [requirements](plan/modules/single-account-cloud/requirements.md), [code disposition](plan/modules/single-account-cloud/code-disposition.md), [priorities](todo/README.md), [latest evidence](operation-log/2026-09-17-phase-6-delivery-result.md).
 
 No credentials or Rewards workflow have been configured. CN/HK live compatibility remains untested. The offline fixture configuration controls only its standalone checker; it does not enable or disable the upstream application.
 

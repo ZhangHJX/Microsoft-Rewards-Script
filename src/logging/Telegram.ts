@@ -26,8 +26,8 @@ function getTelegramEmoji(level: LogLevel): string {
     }
 }
 
-export async function sendTelegram(config: WebhookTelegramConfig, content: string, level: LogLevel): Promise<void> {
-    if (!config?.botToken || !config?.chatId) return
+export async function sendTelegram(config: WebhookTelegramConfig, content: string, level: LogLevel): Promise<boolean> {
+    if (!config?.botToken || !config?.chatId) return false
 
     const emoji = getTelegramEmoji(level)
     const message = `${emoji}\n\`\`\`\n${content}\n\`\`\``
@@ -44,18 +44,20 @@ export async function sendTelegram(config: WebhookTelegramConfig, content: strin
             parse_mode: 'MarkdownV2',
             disable_notification: level === 'debug'
         },
-        timeout: 10000
+        timeout: 10000,
+        retries: 0
     }
 
-    await telegramQueue.add(async () => {
-        try {
-            await httpRequest(request)
-        } catch (err) {
-            const status = (err as { response?: { status?: number } })?.response?.status
-
-            if (status === 429 || status === 401 || status === 403) return
-        }
-    })
+    return (
+        (await telegramQueue.add(async () => {
+            try {
+                const response = await httpRequest<{ ok?: boolean }>(request)
+                return response.data.ok === true
+            } catch {
+                return false
+            }
+        })) === true
+    )
 }
 
 export function flushTelegramQueue(timeoutMs = 5000): Promise<void> {

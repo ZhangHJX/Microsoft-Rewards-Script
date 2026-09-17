@@ -11,8 +11,8 @@ const ntfyQueue = new PQueue({
     carryoverConcurrencyCount: true
 })
 
-export async function sendNtfy(config: WebhookNtfyConfig, content: string, level: LogLevel): Promise<void> {
-    if (!config?.url) return
+export async function sendNtfy(config: WebhookNtfyConfig, content: string, level: LogLevel): Promise<boolean> {
+    if (!config?.url) return false
 
     switch (level) {
         case 'error':
@@ -40,17 +40,20 @@ export async function sendNtfy(config: WebhookNtfyConfig, content: string, level
         url: url,
         headers,
         data: content,
-        timeout: 10000
+        timeout: 10000,
+        retries: 0
     }
 
-    await ntfyQueue.add(async () => {
-        try {
-            await httpRequest(request)
-        } catch (err) {
-            const status = (err as { response?: { status?: number } })?.response?.status
-            if (status === 429) return
-        }
-    })
+    return (
+        (await ntfyQueue.add(async () => {
+            try {
+                await httpRequest(request)
+                return true
+            } catch {
+                return false
+            }
+        })) === true
+    )
 }
 
 export function flushNtfyQueue(timeoutMs = 5000): Promise<void> {

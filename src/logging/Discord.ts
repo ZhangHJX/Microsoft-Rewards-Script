@@ -29,8 +29,8 @@ const LEVEL_COLOR: Record<LogLevel, number> = {
     debug: 0x4f545c // grey
 }
 
-export async function sendDiscord(discordUrl: string, content: string, level: LogLevel): Promise<void> {
-    if (!discordUrl) return
+export async function sendDiscord(discordUrl: string, content: string, level: LogLevel): Promise<boolean> {
+    if (!discordUrl) return false
 
     const request: HttpRequestConfig = {
         method: 'POST',
@@ -40,17 +40,20 @@ export async function sendDiscord(discordUrl: string, content: string, level: Lo
             embeds: [{ description: truncate(content), color: LEVEL_COLOR[level] ?? LEVEL_COLOR.info }],
             allowed_mentions: { parse: [] }
         },
-        timeout: 10000
+        timeout: 10000,
+        retries: 0
     }
 
-    await discordQueue.add(async () => {
-        try {
-            await httpRequest(request)
-        } catch (err) {
-            const status = (err as { response?: { status?: number } })?.response?.status
-            if (status === 429) return
-        }
-    })
+    return (
+        (await discordQueue.add(async () => {
+            try {
+                await httpRequest(request)
+                return true
+            } catch {
+                return false
+            }
+        })) === true
+    )
 }
 
 export function flushDiscordQueue(timeoutMs = 5000): Promise<void> {
