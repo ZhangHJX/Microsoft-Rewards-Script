@@ -123,3 +123,36 @@ for (const scenario of [
         assert.equal(await exit, scenario.expected)
     })
 }
+
+for (const mode of ['balance', 'generic', 'undefined', 'zero']) {
+    test('account result preserves unknown values and sanitizes errors: ' + mode, async () => {
+        const logs = []
+        const method = loadMethod('runTasks', {
+            Locale_1: { resolveAccountLocale: () => ({ language: 'en', country: 'US', locale: 'en-US' }) },
+            Http_1: { default: class {} }
+        })
+        const results = await method.call(
+            {
+                config: { clusters: 2 },
+                userData: {},
+                utils: { getEmailUsername: () => 'synthetic' },
+                logger: { info() {}, warn() {}, error: (...args) => logs.push(args) },
+                Main: async () => {
+                    if (mode === 'zero') return { initialPoints: 0, collectedPoints: 0 }
+                    if (mode === 'undefined') return undefined
+                    throw Object.assign(new Error('SECRET_UNTRUSTED_RESPONSE'), {
+                        code: mode === 'balance' ? 'BALANCE_UNAVAILABLE' : 'ARBITRARY_SECRET'
+                    })
+                }
+            },
+            [{ email: 'synthetic@example.invalid', geoLocale: 'US' }],
+            Date.now()
+        )
+        const result = results[0]
+        assert.equal(result.success, mode === 'zero')
+        for (const key of ['initialPoints', 'finalPoints', 'collectedPoints'])
+            assert.equal(result[key], mode === 'zero' ? 0 : null)
+        if (mode !== 'zero') assert.equal(result.errorCode, mode === 'balance' ? 'BALANCE_UNAVAILABLE' : 'FLOW_FAILED')
+        assert.ok(!JSON.stringify({ results, logs }).includes('SECRET'))
+    })
+}

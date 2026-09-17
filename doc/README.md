@@ -2,29 +2,16 @@
 
 - updated_at: 2026-09-17
 - author: Codex
-- status: phase-3-summary-complete; live-validation-pending
+- status: implementation-in-progress; live-validation-pending
 
-This fork preserves TheNetsky's v4 compatibility work and adds a small, reviewable set of reliability changes. The initial baseline is `d0f07d74a0ed4dda127855d6e3dde98bf4c89d6e` (package version 4.3.2).
+This fork follows TheNetsky v4, baseline d0f07d74a0ed4dda127855d6e3dde98bf4c89d6e (4.3.2). Changes live on codex/single-account-cloud. Preserve upstream history, license and copyright notices.
 
-## Project map
+## Current state
 
-- [Plan and milestones](plan/README.md)
-- [Single-account cloud requirements](plan/modules/single-account-cloud/requirements.md)
-- [Development priorities](todo/README.md)
-- [Initialization record](operation-log/2026-09-17-initialization.md)
+Implemented: primary/flyout balance validation, failed-account exit selection, explicit run summaries, nullable failed-account balances and fixed failure codes. Build and 110 tests pass. These include isolated compiled-method tests, not real account execution or operating-system worker validation.
 
-## Current status
+[Current plan](plan/README.md), [requirements](plan/modules/single-account-cloud/requirements.md), [code disposition](plan/modules/single-account-cloud/code-disposition.md), [priorities](todo/README.md), [latest evidence](operation-log/2026-09-17-phase-3-results.md).
 
-Current: primary/flyout balance validation and account-failure exit selection are implemented; 103 tests and the full build pass. See [exit-status evidence](operation-log/2026-09-17-phase-3-exit-status.md). Structured summaries, observation metadata and end-to-end process validation remain pending. Phase 1 results below are historical.
+No credentials or Rewards workflow have been configured. CN/HK live compatibility remains untested. The offline fixture configuration controls only its standalone checker; it does not enable or disable the upstream application.
 
-DONE: Create the public fork and a separate `codex/single-account-cloud` development branch.
-
-DONE: Record the distinction between regional compatibility testing and concurrent multi-account execution.
-
-DONE: Establish an offline baseline: build passes, 36 offline tests and 4 upstream parser characterization tests pass. Two tests reproduce existing balance defects; they do not certify production correctness. See the [phase report](operation-log/2026-09-17-phase-1.md) and [code disposition](plan/modules/single-account-cloud/code-disposition.md).
-
-Run `npm run validate:fixture -- --fixture tests/fixtures/validation/cn.json` for a synthetic observation. The validation configuration applies only to this checker, not the upstream application. No Rewards workflow or credentials have been added, and no live account has been tested.
-
-The default `v4` branch remains the upstream baseline. Review changes on the development branch before merging. Preserve the upstream license and copyright notices. Keep account credentials, cookies, tokens, and diagnostic account data out of source control, including this documentation tree.
-
-Current update: explicit run summaries and nullable aggregate totals are implemented; 106 tests and build pass. Next: account-result contracts and failure classification. See [summary evidence](operation-log/2026-09-17-phase-3-summary.md).
+Verification commands: npm run test:offline, npm run test:upstream-parser, npm run test:run-status. The latter two rebuild before testing. Never commit account credentials, cookies, tokens or unredacted diagnostic data.

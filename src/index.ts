@@ -44,12 +44,13 @@ interface BrowserSession {
 
 interface AccountStats {
     email: string
-    initialPoints: number
-    finalPoints: number
-    collectedPoints: number
+    initialPoints: number | null
+    finalPoints: number | null
+    collectedPoints: number | null
     duration: number
     success: boolean
     error?: string
+    errorCode?: 'BALANCE_UNAVAILABLE' | 'FLOW_FAILED' | 'ACCOUNT_RESTRICTED'
 }
 
 interface AccountRunResult {
@@ -352,9 +353,9 @@ export class MicrosoftRewardsBot {
                     allAccountStats.some(stats => !stats.success)
                 const accountsFailed = allAccountStats.filter(stats => !stats.success).length
                 const accountsMissing = Math.max(0, this.accounts.length - allAccountStats.length)
-                const totalCollectedPoints = allAccountStats.reduce((sum, s) => sum + s.collectedPoints, 0)
-                const totalInitialPoints = allAccountStats.reduce((sum, s) => sum + s.initialPoints, 0)
-                const totalFinalPoints = allAccountStats.reduce((sum, s) => sum + s.finalPoints, 0)
+                const totalCollectedPoints = allAccountStats.reduce((sum, s) => sum + (s.collectedPoints ?? 0), 0)
+                const totalInitialPoints = allAccountStats.reduce((sum, s) => sum + (s.initialPoints ?? 0), 0)
+                const totalFinalPoints = allAccountStats.reduce((sum, s) => sum + (s.finalPoints ?? 0), 0)
                 const totalDurationMinutes = ((Date.now() - runStartTime) / 1000 / 60).toFixed(1)
 
                 this.logger.info(
@@ -444,14 +445,7 @@ export class MicrosoftRewardsBot {
                     'Accept-Language': this.accountLocale.acceptLanguage
                 })
 
-                const result: AccountRunResult | undefined = await this.Main(account).catch(error => {
-                    void this.logger.error(
-                        true,
-                        'FLOW',
-                        `Mobile flow failed for ${accountEmail}: ${error instanceof Error ? error.message : String(error)}`
-                    )
-                    return undefined
-                })
+                const result: AccountRunResult | undefined = await this.Main(account)
 
                 const durationSeconds = ((Date.now() - accountStartTime) / 1000).toFixed(1)
 
@@ -468,7 +462,8 @@ export class MicrosoftRewardsBot {
                             collectedPoints: 0,
                             duration: parseFloat(durationSeconds),
                             success: false,
-                            error: 'Microsoft bot-score warning detected'
+                            error: 'Microsoft bot-score warning detected',
+                            errorCode: 'ACCOUNT_RESTRICTED'
                         })
 
                         this.logger.warn(
@@ -496,30 +491,37 @@ export class MicrosoftRewardsBot {
                 } else {
                     accountStats.push({
                         email: accountEmail,
-                        initialPoints: 0,
-                        finalPoints: 0,
-                        collectedPoints: 0,
+                        initialPoints: null,
+                        finalPoints: null,
+                        collectedPoints: null,
                         duration: parseFloat(durationSeconds),
                         success: false,
-                        error: 'Flow failed'
+                        error: 'Flow failed',
+                        errorCode: 'FLOW_FAILED'
                     })
                 }
             } catch (error) {
                 const durationSeconds = ((Date.now() - accountStartTime) / 1000).toFixed(1)
-                this.logger.error(
-                    'main',
-                    'ACCOUNT-ERROR',
-                    `${accountEmail}: ${error instanceof Error ? error.message : String(error)}`
-                )
+                const errorCode =
+                    typeof error === 'object' &&
+                    error !== null &&
+                    'code' in error &&
+                    error.code === 'BALANCE_UNAVAILABLE'
+                        ? 'BALANCE_UNAVAILABLE'
+                        : 'FLOW_FAILED'
+                const errorMessage =
+                    errorCode === 'BALANCE_UNAVAILABLE' ? 'Rewards balance is missing or invalid' : 'Flow failed'
+                this.logger.error('main', 'ACCOUNT-ERROR', `${accountEmail}: ${errorCode} | ${errorMessage}`)
 
                 accountStats.push({
                     email: accountEmail,
-                    initialPoints: 0,
-                    finalPoints: 0,
-                    collectedPoints: 0,
+                    initialPoints: null,
+                    finalPoints: null,
+                    collectedPoints: null,
                     duration: parseFloat(durationSeconds),
                     success: false,
-                    error: error instanceof Error ? error.message : String(error)
+                    error: errorMessage,
+                    errorCode
                 })
             }
         }
@@ -527,9 +529,9 @@ export class MicrosoftRewardsBot {
         if (this.config.clusters <= 1 && cluster.isPrimary) {
             const accountsFailed = accountStats.filter(stats => !stats.success).length
             const failed = accountsFailed > 0
-            const totalCollectedPoints = accountStats.reduce((sum, s) => sum + s.collectedPoints, 0)
-            const totalInitialPoints = accountStats.reduce((sum, s) => sum + s.initialPoints, 0)
-            const totalFinalPoints = accountStats.reduce((sum, s) => sum + s.finalPoints, 0)
+            const totalCollectedPoints = accountStats.reduce((sum, s) => sum + (s.collectedPoints ?? 0), 0)
+            const totalInitialPoints = accountStats.reduce((sum, s) => sum + (s.initialPoints ?? 0), 0)
+            const totalFinalPoints = accountStats.reduce((sum, s) => sum + (s.finalPoints ?? 0), 0)
             const totalDurationMinutes = ((Date.now() - runStartTime) / 1000 / 60).toFixed(1)
 
             this.logger.info(
